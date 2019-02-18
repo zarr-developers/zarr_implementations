@@ -5,13 +5,13 @@ from skimage.data import astronaut
 CHUNKS = (100, 100, 1)
 
 
-def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
+def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', 'raw']):
     path = '../data/z5py.zr'
     im = astronaut()
 
     f = z5py.File(path)
     for compressor in compressors:
-        name = compressor if compressor is not None else 'raw'
+        name = compressor
         f.create_dataset(name, data=im, compression=compressor, chunks=CHUNKS)
 
 
