@@ -1,2 +1,3 @@
 mvn clean package
-# java -Xmx6g -cp target/n5_java-2.0.3-SNAPSHOT.jar zarr_pp.n5.App 
+java -jar target/n5_java-1.0.0.jar
+# java -cp target/n5_java-1.0.0.jar zarr_implementations.n5_java.App

@@ -24,8 +24,9 @@ import java.nio.file.Paths;
 
 public class App {
 
-	// probably best to use some weird block size, adapt as needed
-	private static final int[] BLOCK_SIZE = new int[]{101, 97, 1};
+    // NOTE for now we use 100, 100, 1 as block-size in all examples
+    // maybe it's a better idea to make this more irregular though
+	private static final int[] BLOCK_SIZE = new int[]{100, 100, 1};
 	private static final String IN_PATH = Paths.get("..", "..", "data", "reference_image.png").toString();
 	private static final String OUT_PATH = Paths.get("..", "..", "data", "n5-java.n5").toString();
 
