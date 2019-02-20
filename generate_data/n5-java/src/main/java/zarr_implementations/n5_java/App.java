@@ -1,30 +1,35 @@
-package zarr_implementations.n5_java;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.img.array.ArrayImgs;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
+import net.imglib2.util.Intervals;
+import net.imglib2.view.Views;
+import org.janelia.saalfeldlab.n5.Bzip2Compression;
+import org.janelia.saalfeldlab.n5.Compression;
+import org.janelia.saalfeldlab.n5.DataType;
+import org.janelia.saalfeldlab.n5.DatasetAttributes;
+import org.janelia.saalfeldlab.n5.GzipCompression;
+import org.janelia.saalfeldlab.n5.Lz4Compression;
+import org.janelia.saalfeldlab.n5.N5FSWriter;
+import org.janelia.saalfeldlab.n5.RawCompression;
+import org.janelia.saalfeldlab.n5.XzCompression;
+import org.janelia.saalfeldlab.n5.imglib2.N5Utils;
 
-import org.janelia.saalfeldlab.n5.*;
-
-import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.File;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
+import java.awt.image.DataBufferByte;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 
 public class App {
 
-    static private long[] dimensions = new long[]{512, 512, 3};
-    static private int[] blockSize = new int[]{100, 100, 1};
-    static private int[] nBlocks = new int[]{6, 6, 3};
+	// probably best to use some weird block size, adapt as needed
+	private static final int[] BLOCK_SIZE = new int[]{101, 97, 1};
+	private static final String IN_PATH = Paths.get("..", "..", "data", "reference_image.png").toString();
+	private static final String OUT_PATH = Paths.get("..", "..", "data", "n5-java.n5").toString();
 
-    static private String inPath = "../../data/reference_image.png";
-	static private String outPath = "../../data/n5-java.n5";
-
-    // NOTE this needs to be int because that's what we get by imageio's
-    // getSamples
-    static int[] dataBlock;
-	
-    private static Compression[] getCompressions() {
+	private static Compression[] getCompressions() {
 
 		return new Compression[] {
 				new RawCompression(),
@@ -32,53 +37,34 @@ public class App {
 				new GzipCompression(),
 				new Lz4Compression(),
 				new XzCompression()
-			};
+		};
 	}
 
-    static private N5Writer n5;
-    
-    public static void makeTestData(Compression compression) throws IOException {
-        
-        final String compressionName = compression.getType();
-		
-        // open the n5 filesystem writer and create the dataset
-		n5 = new N5FSWriter(outPath);
-        // TODO we want uint8 in the end !
-        n5.createDataset(compressionName, dimensions, blockSize, DataType.INT32, compression);
-        final DatasetAttributes attrs = n5.getDatasetAttributes(compressionName);
+	private static RandomAccessibleInterval<UnsignedByteType> getData() throws IOException {
 
-        // read the input image
-        File initialImage = new File(inPath);
-        BufferedImage bImage = ImageIO.read(initialImage);
-        Raster image = bImage.getData();
-        
-        dataBlock = new int[blockSize[0] * blockSize[1] * blockSize[2]];
-        
-        // iterate over all image blocks
-        for(int x = 0; x < nBlocks[0]; x++) {
-            for(int y = 0; y < nBlocks[1]; y++) {
-                for(int c = 0; c < nBlocks[2]; c++) {
-                    // TODO calculate proper height and width for edge chunks
-                    int w = blockSize[0];
-                    int h = blockSize[1];
-                    // read the pixels TODO is this ok ??
-                    dataBlock = image.getSamples(x, y, w, h, c, dataBlock);
-                    
-                    // write byte
-                    final IntArrayDataBlock intDataBlock = new IntArrayDataBlock(
-                        blockSize, new long[]{x, y, c}, dataBlock
-                    );
-                    n5.writeBlock(compressionName, attrs, intDataBlock);
-                }
-            }
-        }
-    }
-    
+		final BufferedImage bufferedImage = ImageIO.read(new File(IN_PATH));
+		byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
+		// some annoying axis manipulations because of how the image is read
+		return Views.zeroMin(Views.moveAxis(
+				Views.invertAxis(ArrayImgs.unsignedBytes(
+					pixels,
+					pixels.length / bufferedImage.getWidth() / bufferedImage.getHeight(),
+					bufferedImage.getWidth(),
+					bufferedImage.getHeight()), 0),
+				0,
+				2));
+	}
 
-    public static void main(String args[]) throws IOException {
+
+	public static void main(String args[]) throws IOException {
+		RandomAccessibleInterval<UnsignedByteType> data = getData();
+		final N5FSWriter container = new N5FSWriter(OUT_PATH);
 		for (final Compression compression : getCompressions()) {
-            makeTestData(compression);
-        }
-    }
+			final DatasetAttributes attrs = new DatasetAttributes(Intervals.dimensionsAsLongArray(data), BLOCK_SIZE, DataType.UINT8, compression);
+			final String dataset = compression.getType();
+			container.createDataset(dataset, attrs);
+			N5Utils.save(data, container, dataset, BLOCK_SIZE, compression);
+		}
+	}
 
 }
