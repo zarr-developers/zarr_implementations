@@ -28,7 +28,7 @@ public class App {
 
     // NOTE for now we use 100, 100, 1 as block-size in all examples
     // maybe it's a better idea to make this more irregular though
-	private static final int[] BLOCK_SIZE = new int[]{100, 100, 1};
+	private static final int[] BLOCK_SIZE = new int[]{1, 100, 100};
 	private static final String IN_PATH = Paths.get("..", "..", "data", "reference_image.png").toString();
 	private static final String OUT_PATH = Paths.get("..", "..", "data", "n5-java.n5").toString();
 
@@ -48,14 +48,12 @@ public class App {
 		final BufferedImage bufferedImage = ImageIO.read(new File(IN_PATH));
 		byte[] pixels = ((DataBufferByte) bufferedImage.getRaster().getDataBuffer()).getData();
 		// some annoying axis manipulations because of how the image is read
-		return Views.zeroMin(Views.moveAxis(
+		return Views.zeroMin(
 				Views.invertAxis(ArrayImgs.unsignedBytes(
 					pixels,
 					pixels.length / bufferedImage.getWidth() / bufferedImage.getHeight(),
 					bufferedImage.getWidth(),
-					bufferedImage.getHeight()), 0),
-				0,
-				2));
+					bufferedImage.getHeight()), 0));
 	}
 
 
