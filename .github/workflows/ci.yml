@@ -21,7 +21,21 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      
+    - name: Setup conda
+      uses: s-weigand/setup-conda@v1.0.2
+      with:
+        python-version: 3.7
+        conda-channels: conda-forge
+
+    - name: Install dependencies
+      run: |
+        conda create -c conda-forge -n test-env pip z5py zarr pytest
+        source activate test-env
+        pip install pyn5
 
     # Runs a single command using the runners shell
     - name: Test compatibility
-      run: make test
+      run: |
+        source activate test-env 
+        make test
