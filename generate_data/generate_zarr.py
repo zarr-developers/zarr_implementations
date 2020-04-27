@@ -13,7 +13,7 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
     path = '../data/zarr.zr'
     im = astronaut()
 
-    f = zarr.open(path)
+    f = zarr.open(path, mode='w')
     for compressor in compressors:
         name = compressor if compressor is not None else 'raw'
         compressor_impl = STR_TO_COMPRESSOR[compressor] if compressor is not None else None
@@ -26,7 +26,7 @@ def generate_n5_format(compressors=['gzip', None]):
     path = '../data/zarr.n5'
     im = astronaut()
 
-    f = zarr.open(path)
+    f = zarr.open(path, mode='w')
     for compressor in compressors:
         name = compressor if compressor is not None else 'raw'
         compressor_impl = STR_TO_COMPRESSOR[compressor] if compressor is not None else None

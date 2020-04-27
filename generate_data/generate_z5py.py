@@ -19,7 +19,7 @@ def generate_n5_format(compressors=['gzip', 'raw']):
     path = '../data/z5py.n5'
     im = astronaut()
 
-    f = z5py.File(path)
+    f = z5py.File(path, mode='w')
     for compressor in compressors:
         name = compressor
         f.create_dataset(name, data=im, chunks=CHUNKS, compression=compressor)

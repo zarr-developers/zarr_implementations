@@ -1,3 +1,7 @@
+# clean the n5 data. ideally, this would be done in n5-java, but I don't know if
+# it supports truncate mode
+rm -r data/n5-java.n5
+
 # cd to this directory
 # https://stackoverflow.com/a/6393573/2700168
 cd "${0%/*}"
