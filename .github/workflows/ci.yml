@@ -30,7 +30,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        conda create -c conda-forge -n test-env pip z5py zarr pytest scikit-image
+        conda create -c conda-forge -n test-env pip z5py zarr pytest scikit-image pillow>=7.1.2
         source activate test-env
         pip install pyn5
 
