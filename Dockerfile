@@ -7,5 +7,4 @@ RUN conda env create -f environment.yml -n z
 SHELL ["conda", "run", "-n", "z", "/bin/bash", "-c"]
 
 COPY . /src
-RUN pip install pyn5
 ENTRYPOINT ["conda", "run", "-n", "z", "make"]
