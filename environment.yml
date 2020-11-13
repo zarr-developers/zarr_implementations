@@ -7,9 +7,9 @@ dependencies:
   - make
   - z5py
   - python == 3.7.9
-  - flake8
-  - pip
+  - scikit-image
   - pytest
   - zarr >= 2.4.0
+  - pip
   - pip:
       - pyn5
