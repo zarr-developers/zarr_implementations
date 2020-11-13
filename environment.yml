@@ -1,32 +1,15 @@
-#name: z
 channels:
-  - defaults
-  - ome
   - conda-forge
-  - anaconda
+  - defaults
 dependencies:
   - openjdk
   - maven
   - make
   - z5py
   - python == 3.7.9
-  - pyside2
-  - napari
   - flake8
-  - ipython
-  - mypy
-  - omero-py
-  - opencv
   - pip
-  - py-opencv
   - pytest
-  - requests
-  - s3fs
-  - scikit-image
-  - scipy
-  - xarray
   - zarr >= 2.4.0
   - pip:
-      - pre-commit
-      - pytest-qt
       - pyn5
