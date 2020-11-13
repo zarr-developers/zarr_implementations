@@ -1,0 +1,31 @@
+---
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: ${{ matrix.platform }} ${{ matrix.python-version }}
+    runs-on: ${{ matrix.platform }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest]
+        python-version: [3.7]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v1
+        with:
+          auto-update-conda: true
+          channels: conda-forge,ome
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: make
