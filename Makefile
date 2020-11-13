@@ -1,3 +1,6 @@
+test: data
+	pytest -v
+
 data/reference_image.png:
 	python generate_reference_image.py
 
@@ -21,6 +24,3 @@ zarr: data/reference_image.png
 data: n5java pyn5 z5py zarr
 
 .PHONY: test
-test: data
-	pytest -v
-
