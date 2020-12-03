@@ -31,7 +31,7 @@ jobs:
       - name: Install zarr dev
         shell: bash -l {0}
         run: |
-          python -m pip install https://github.com/zarr-developers/zarr-python
+          python -m pip install git+https://github.com/zarr-developers/zarr-python.git@master
 
       - name: Run tests
         shell: bash -l {0}
