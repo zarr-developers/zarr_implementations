@@ -5,7 +5,7 @@ from skimage.data import astronaut
 CHUNKS = (100, 100, 1)
 
 # options for the different compressors
-COMPRESSION_OPTIONS = {'blosc': {'filter_id': 'lz4'}}
+COMPRESSION_OPTIONS = {"blosc": {"codec": "lz4"}}
 
 
 # TODO support more compressors:
@@ -18,7 +18,11 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', 'raw']):
     f = z5py.File(path)
     for compressor in compressors:
         copts = COMPRESSION_OPTIONS.get(compressor, {})
-        name = compressor if compressor != 'blosc' else '%s/%s' % (compressor, copts.get('filter_id'))
+        name = (
+            compressor
+            if compressor != "blosc"
+            else "%s/%s" % (compressor, copts.get("codec"))
+        )
         f.create_dataset(name, data=im, compression=compressor, chunks=CHUNKS, **copts)
 
 

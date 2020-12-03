@@ -25,6 +25,8 @@ jobs:
           channels: conda-forge,ome
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: Run tests
         shell: bash -l {0}
