@@ -40,6 +40,8 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
 
 def read_with_zarr(fpath, ds_name):
     import zarr
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
     return zarr.open(os.fspath(fpath))[ds_name][:]
 
 
@@ -50,6 +52,8 @@ def read_with_pyn5(fpath, ds_name):
 
 def read_with_z5py(fpath, ds_name):
     import z5py
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
     return z5py.File(fpath)[ds_name][:]
 
 
