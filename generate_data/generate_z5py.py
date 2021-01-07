@@ -12,7 +12,7 @@ COMPRESSION_OPTIONS = {"blosc": {"codec": "lz4"}}
 # - more compressors in numcodecs
 # - more blosc codecs
 def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', 'raw']):
-    path = '../data/z5py.zr'
+    path = 'data/z5py.zr'
     im = astronaut()
 
     f = z5py.File(path)
@@ -27,7 +27,7 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', 'raw']):
 
 
 def generate_n5_format(compressors=['gzip', 'raw']):
-    path = '../data/z5py.n5'
+    path = 'data/z5py.n5'
     im = astronaut()
 
     f = z5py.File(path)
