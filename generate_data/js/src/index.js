@@ -7,16 +7,16 @@ import FSStore from "./fsstore.js";
 
 const CHUNKS = [100, 100, 1];
 const STR_TO_COMPRESSOR = {
-  gzip: { id: "gzip" },
-  blosc: { id: "blosc", cname: "lz4" },
-  zlib: { id: "zlib" },
+  gzip: { id: "gzip", level: 1 },
+  blosc: { id: "blosc", cname: "lz4", clevel: 5, blocksize: 0, shuffle: 1 },
+  zlib: { id: "zlib", level: 1 },
 };
 
 // Simple convenience method to init the root for an empty store.
 async function open(path) {
   const store = new FSStore(path);
   const text = JSON.stringify({ zarr_format: 2 });
-  await store.setItem(".zgroup", Buffer.from(text))
+  await store.setItem(".zgroup", Buffer.from(text));
   return openGroup(store);
 }
 
@@ -28,16 +28,16 @@ function getImage(path) {
 }
 
 function getName(config) {
-    if (config === null) return 'raw';
-    if (config.cname) return `${config.id}/${config.cname}`;
-    return config.id;
+  if (config === null) return "raw";
+  if (config.cname) return `${config.id}/${config.cname}`;
+  return config.id;
 }
 
 async function generateZarrFormat(codecIds = ["gzip", "blosc", "zlib", null]) {
   const path = p.join("..", "..", "data", "js.zr");
   const img = getImage(p.join("..", "..", "data", "reference_image.png"));
 
-  fs.rmdirSync(path, { recursive: true, force: true });
+  fs.rmSync(path, { recursive: true, force: true });
   const grp = await open(path);
   for (const id of codecIds) {
     const config = id ? STR_TO_COMPRESSOR[id] : null;
@@ -45,6 +45,7 @@ async function generateZarrFormat(codecIds = ["gzip", "blosc", "zlib", null]) {
     grp.createDataset(name, undefined, img, {
       compressor: config,
       chunks: CHUNKS,
+      fillValue: 0,
     });
   }
 }
