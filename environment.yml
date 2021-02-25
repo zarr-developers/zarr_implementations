@@ -5,6 +5,7 @@ dependencies:
   - openjdk
   - maven
   - make
+  - nodejs
   - z5py >= 2.0.8
   - python == 3.7.9
   - scikit-image
