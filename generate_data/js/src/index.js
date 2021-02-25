@@ -20,7 +20,7 @@ async function open(path) {
   return openGroup(store);
 }
 
-function getImage(path) {
+function imread(path) {
   const buf = fs.readFileSync(path);
   const { data, height, width } = PNG.sync.read(buf, { colorType: 2 });
   const arr = new NestedArray(new Uint8Array(data), [height, width, 4]);
@@ -35,7 +35,7 @@ function getName(config) {
 
 async function generateZarrFormat(codecIds = ["gzip", "blosc", "zlib", null]) {
   const path = p.join("..", "..", "data", "js.zr");
-  const img = getImage(p.join("..", "..", "data", "reference_image.png"));
+  const img = imread(p.join("..", "..", "data", "reference_image.png"));
 
   fs.rmSync(path, { recursive: true, force: true });
   const grp = await open(path);
