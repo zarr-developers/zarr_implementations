@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "pngjs": "^6.0.0",
+    "zarr": "^0.4.0"
+  }
+}
