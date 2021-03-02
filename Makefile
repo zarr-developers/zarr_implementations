@@ -24,7 +24,11 @@ zarr: data/reference_image.png
 js: data/reference_image.png
 	bash generate_data/js/generate_data.sh
 
+.PHONY: xtensor_zarr
+xtensor_zarr: data/reference_image.png
+	bash generate_data/xtensor_zarr/generate_data.sh
+
 .PHONY: data
-data: n5java pyn5 z5py zarr js
+data: n5java pyn5 z5py zarr js xtensor_zarr
 
 .PHONY: test
