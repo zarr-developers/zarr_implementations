@@ -5,6 +5,11 @@ dependencies:
   - openjdk
   - maven
   - make
+  - cmake
+  - xtensor-zarr=0.0.3=*_1
+  - openimageio
+  - zlib
+  - blosc
   - nodejs
   - z5py >= 2.0.8
   - python == 3.7.9
