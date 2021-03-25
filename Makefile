@@ -20,6 +20,10 @@ z5py: data/reference_image.png
 zarr: data/reference_image.png
 	python generate_data/generate_zarr.py
 
+.PHONY: zarritra
+zarrita: data/reference_image.png
+	python generate_data/generate_zarrita.py
+
 .PHONY: js
 js: data/reference_image.png
 	bash generate_data/js/generate_data.sh
