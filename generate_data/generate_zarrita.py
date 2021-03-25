@@ -15,7 +15,7 @@ COMPRESSION_OPTIONS = {"blosc": {"cname": "lz4"}}
 def generate_zr3_format(compressors=['gzip', 'blosc', 'zlib', None]):
     im = astronaut()
 
-    h = zarrita.create_hierarchy('data/zarr.zr3')
+    h = zarrita.create_hierarchy('data/zarrita.zr3')
     for compressor in compressors:
         copts = COMPRESSION_OPTIONS.get(compressor, {})
         if compressor is None:
