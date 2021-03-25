@@ -25,15 +25,23 @@ import pytest
 READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
     "z5py": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
+        "zarr-v3": [],
         "N5": ["gzip", "raw"],
     },
     "pyn5": {
         "N5": ["bzip2", "gzip", "raw"],
+        "zarr-v3": [],
         "zarr": [],
     },
     "zarr": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
+        "zarr-v3": [],
         "N5": ["gzip", "raw"],
+    },
+    "zarrita": {
+        "zarr": [],
+        "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
+        "N5": [],
     }
 }
 
@@ -57,14 +65,23 @@ def read_with_z5py(fpath, ds_name):
     return z5py.File(fpath)[ds_name][:]
 
 
+def read_with_zarrita(fpath, ds_name):
+    import zarrita
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+    h = zarrita.get_hierarchy(str(fpath.absolute()))
+    return h["/" + ds_name][:]
+
+
 READ_FNS = {
     "zarr": read_with_zarr,
+    "zarrita": read_with_zarrita,
     "pyn5": read_with_pyn5,
     "z5py": read_with_z5py,
 }
 
 
-EXTENSIONS = {"zarr": ".zr", "N5": ".n5"}
+EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
 HERE = Path(__file__).resolve().parent
 DATA_DIR = HERE.parent / "data"
 
@@ -77,7 +94,12 @@ def libraries_for_format(format: str):
 
 
 def codecs_for_file(fpath: Path):
-    return sorted(d.name for d in fpath.iterdir() if d.is_dir())
+    if fpath.name.endswith('.zr3'):
+        # for zarr v3 have to search for the arrays in the data root folder
+        data_root = fpath / 'data' / 'root'
+        return sorted(d.name for d in data_root.iterdir() if d.is_dir())
+    else:
+        return sorted(d.name for d in fpath.iterdir() if d.is_dir())
 
 
 def create_params():
@@ -114,6 +136,7 @@ def test_correct_read(fmt, writing_library, reading_library, codec):
         "zarr": read_with_zarr,
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
+        "zarrita": read_with_zarrita,
     }[reading_library]
     test = read_fn(fpath, codec)
     assert test.shape == reference.shape
