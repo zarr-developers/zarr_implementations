@@ -19,3 +19,4 @@ dependencies:
   - pip
   - pip:
       - pyn5
+      - git+https://github.com/grlee77/zarrita.git@codec_update
