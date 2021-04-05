@@ -36,3 +36,20 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: make
+
+      - name: Generate Report
+        shell: bash -l {0}
+        run: |
+            python test/test_read_all.py
+
+      - name: Archive HTML test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report-html
+          path: report.html
+
+      - name: Archive Markdown test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report-md
+          path: report.md
