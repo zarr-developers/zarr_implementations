@@ -17,6 +17,8 @@ dependencies:
   - pytest
   - zarr >= 2.4.0
   - pip
+  - pandas
+  - tabulate
   - pip:
       - pyn5
       - git+https://github.com/grlee77/zarrita.git@codec_update
