@@ -42,14 +42,10 @@ jobs:
         run: |
             python test/test_read_all.py
 
-      - name: Archive HTML test report
+      - name: Archive test report artifacts
         uses: actions/upload-artifact@v2
         with:
           name: test-report-html
-          path: report.html
-
-      - name: Archive Markdown test report
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-report-md
-          path: report.md
+          path: |
+              report.md
+              report.html
