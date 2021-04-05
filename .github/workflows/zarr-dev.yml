@@ -45,7 +45,7 @@ jobs:
       - name: Archive test report artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: test-report-html
+          name: test-report
           path: |
               report.md
               report.html
