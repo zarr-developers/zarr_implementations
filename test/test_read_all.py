@@ -127,9 +127,7 @@ def create_params():
 argnames, params, ids = create_params()
 
 
-@pytest.mark.parametrize(argnames, params, ids=ids)
-def test_correct_read(fmt, writing_library, reading_library, codec):
-    reference = imread(DATA_DIR / "reference_image.png")
+def _get_read_fn(fmt, writing_library, reading_library):
     fpath = DATA_DIR / f"{writing_library}{EXTENSIONS[fmt]}"
     read_fn = {
         "zarr": read_with_zarr,
@@ -137,24 +135,24 @@ def test_correct_read(fmt, writing_library, reading_library, codec):
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
     }[reading_library]
+    return fpath, read_fn
+
+
+@pytest.mark.parametrize(argnames, params, ids=ids)
+def test_correct_read(fmt, writing_library, reading_library, codec):
+    reference = imread(DATA_DIR / "reference_image.png")
+    fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library)
     test = read_fn(fpath, codec)
     assert test.shape == reference.shape
     assert np.allclose(test, reference)
 
 
 def tabulate_test_results(params, per_codec_tables=False):
+    reference = imread(DATA_DIR / "reference_image.png")
+
     all_results = {}
-
     for fmt, writing_library, reading_library, codec in params:
-        reference = imread(DATA_DIR / "reference_image.png")
-        fpath = DATA_DIR / f"{writing_library}{EXTENSIONS[fmt]}"
-        read_fn = {
-            "zarr": read_with_zarr,
-            "pyn5": read_with_pyn5,
-            "z5py": read_with_z5py,
-            "zarrita": read_with_zarrita,
-        }[reading_library]
-
+        fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library)
         fail_type = None
         try:
             test = read_fn(fpath, codec)
