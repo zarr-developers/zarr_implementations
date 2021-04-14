@@ -7,6 +7,7 @@ dependencies:
   - make
   - cmake
   - xtensor-zarr=0.0.3=*_1
+  - xtensor != 0.23.5
   - openimageio
   - zlib
   - blosc
