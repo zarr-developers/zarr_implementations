@@ -13,11 +13,17 @@ COMPRESSION_OPTIONS = {"blosc": {"cname": "lz4"}}
 
 
 # TODO use more compressors from numcodecs and more blosc filter_ids
-def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
-    path = 'data/zarr.zr'
+def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None],
+                         nested=False):
+    if nested:
+        path = 'data/zarr.zr'
+        store = path
+    else:
+        path = 'data/zarr_nested.zr'
+        store = zarr.storage.FSStore(path, key_separator='/', auto_mkdir=True)
     im = astronaut()
 
-    f = zarr.open(path, mode='w')
+    f = zarr.open(store, mode='w')
     for compressor in compressors:
         copts = COMPRESSION_OPTIONS.get(compressor, {})
         if compressor is None:
@@ -32,10 +38,9 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
 
 
 def generate_n5_format(compressors=['gzip', None]):
-    path = 'data/zarr.n5'
     im = astronaut()
 
-    f = zarr.open(path, mode='w')
+    f = zarr.open('data/zarr.n5', mode='w')
     for compressor in compressors:
         name = compressor if compressor is not None else 'raw'
         compressor_impl = STR_TO_COMPRESSOR[compressor]() if compressor is not None else None
@@ -44,5 +49,6 @@ def generate_n5_format(compressors=['gzip', None]):
 
 
 if __name__ == '__main__':
-    generate_zarr_format()
+    for nested in [False, True]:
+        generate_zarr_format(nested=nested)
     generate_n5_format()

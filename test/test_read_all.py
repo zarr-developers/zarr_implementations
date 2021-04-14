@@ -46,26 +46,32 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
 }
 
 
-def read_with_zarr(fpath, ds_name):
+def read_with_zarr(fpath, ds_name, nested):
     import zarr
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    return zarr.open(os.fspath(fpath))[ds_name][:]
+    if nested:
+        store = zarr.storage.FSStore(
+            os.fspath(fpath), key_separator='/', mode='r'
+        )
+    else:
+        store = os.fspath(fpath)
+    return zarr.open(store)[ds_name][:]
 
 
-def read_with_pyn5(fpath, ds_name):
+def read_with_pyn5(fpath, ds_name, nested):
     import pyn5
     return pyn5.File(fpath)[ds_name][:]
 
 
-def read_with_z5py(fpath, ds_name):
+def read_with_z5py(fpath, ds_name, nested):
     import z5py
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
     return z5py.File(fpath)[ds_name][:]
 
 
-def read_with_zarrita(fpath, ds_name):
+def read_with_zarrita(fpath, ds_name, nested):
     import zarrita
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
@@ -103,11 +109,14 @@ def codecs_for_file(fpath: Path):
 
 
 def create_params():
-    argnames = ["fmt", "writing_library", "reading_library", "codec"]
+    argnames = ["fmt", "writing_library", "reading_library", "codec", "nested"]
     params = []
     ids = []
     for fmt in EXTENSIONS:
-        for writing_library, fpath in libraries_for_format(fmt).items():
+        for file_stem, fpath in libraries_for_format(fmt).items():
+            nested = "_nested" in file_stem
+            writing_library = file_stem.replace("_nested", "")
+            nested_str = "nested" if nested else ""
             written_codecs = codecs_for_file(fpath)
             for reading_library, available_fmts in READABLE_CODECS.items():
                 available_codecs = available_fmts.get(fmt, [])
@@ -115,10 +124,10 @@ def create_params():
                     set(available_codecs).intersection(written_codecs)
                 ):
                     params.append(
-                        (fmt, writing_library, reading_library, codec)
+                        (fmt, writing_library, reading_library, codec, nested)
                     )
                     ids.append(
-                        f"read {writing_library} {fmt} using "
+                        f"read {nested_str} {writing_library} {fmt} using "
                         f"{reading_library}, {codec}"
                     )
     return argnames, params, ids
@@ -139,10 +148,14 @@ def _get_read_fn(fmt, writing_library, reading_library):
 
 
 @pytest.mark.parametrize(argnames, params, ids=ids)
-def test_correct_read(fmt, writing_library, reading_library, codec):
+def test_correct_read(fmt, writing_library, reading_library, codec, nested):
+    if nested and reading_library != 'zarr':
+        pytest.skip("nested read not implemented")
+
     reference = imread(DATA_DIR / "reference_image.png")
+    nested_str = "_nested" if nested else ""
     fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library)
-    test = read_fn(fpath, codec)
+    test = read_fn(fpath, codec, nested)
     assert test.shape == reference.shape
     assert np.allclose(test, reference)
 
