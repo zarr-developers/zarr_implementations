@@ -36,3 +36,7 @@ xtensor_zarr: data/reference_image.png
 data: n5java pyn5 z5py zarr js xtensor_zarr zarrita
 
 .PHONY: test
+
+.PHONY: report
+report: data
+	python test/test_read_all.py
