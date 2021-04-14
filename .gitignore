@@ -1,5 +1,6 @@
 target*
 __pycache__/
 node_modules/
-# ignore test summary reports
 report.*
+# ignore data subdirectories
+data/**/
