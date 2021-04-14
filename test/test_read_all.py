@@ -149,7 +149,7 @@ def _get_read_fn(fmt, writing_library, reading_library):
 
 @pytest.mark.parametrize(argnames, params, ids=ids)
 def test_correct_read(fmt, writing_library, reading_library, codec, nested):
-    if nested and reading_library != 'zarr':
+    if nested and reading_library not in ['zarr', 'zarrita']:
         pytest.skip("nested read not implemented")
 
     reference = imread(DATA_DIR / "reference_image.png")
