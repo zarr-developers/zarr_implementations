@@ -1,5 +1,7 @@
 target*
 __pycache__/
+generate_data/xtensor_zarr/build
 node_modules/
-# ignore test summary reports
 report.*
+# ignore data subdirectories
+data/**/
