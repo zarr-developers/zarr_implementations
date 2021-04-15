@@ -51,9 +51,14 @@ def read_with_zarr(fpath, ds_name, nested):
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
     if nested:
-        store = zarr.storage.FSStore(
-            os.fspath(fpath), key_separator='/', mode='r'
-        )
+        # Need to fix zarr-python upstream to respect key_separator for FSStore
+        use_fsstore = False
+        if use_fsstore:
+            store = zarr.storage.FSStore(
+                os.fspath(fpath), key_separator='/', mode='r'
+            )
+        else:
+            store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
     else:
         store = os.fspath(fpath)
     return zarr.open(store)[ds_name][:]
@@ -136,8 +141,8 @@ def create_params():
 argnames, params, ids = create_params()
 
 
-def _get_read_fn(fmt, writing_library, reading_library):
-    fpath = DATA_DIR / f"{writing_library}{EXTENSIONS[fmt]}"
+def _get_read_fn(fmt, writing_library, reading_library, nested_str):
+    fpath = DATA_DIR / f"{writing_library}{nested_str}{EXTENSIONS[fmt]}"
     read_fn = {
         "zarr": read_with_zarr,
         "pyn5": read_with_pyn5,
@@ -154,7 +159,8 @@ def test_correct_read(fmt, writing_library, reading_library, codec, nested):
 
     reference = imread(DATA_DIR / "reference_image.png")
     nested_str = "_nested" if nested else ""
-    fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library)
+    fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library,
+                                  nested_str)
     test = read_fn(fpath, codec, nested)
     assert test.shape == reference.shape
     assert np.allclose(test, reference)
