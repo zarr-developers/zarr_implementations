@@ -170,11 +170,13 @@ def tabulate_test_results(params, per_codec_tables=False):
     reference = imread(DATA_DIR / "reference_image.png")
 
     all_results = {}
-    for fmt, writing_library, reading_library, codec in params:
-        fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library)
+    for fmt, writing_library, reading_library, codec, nested in params:
+        nested_str = "_nested" if nested else ""
+        fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library,
+                                      nested_str)
         fail_type = None
         try:
-            test = read_fn(fpath, codec)
+            test = read_fn(fpath, codec, nested)
         except Exception as e:
             fail_type = f"{type(e).__name__}: {e}"
 
@@ -184,12 +186,14 @@ def tabulate_test_results(params, per_codec_tables=False):
         else:
             result = fail_type
 
+        nstr = 'nested' if nested else 'flat'
         if per_codec_tables:
             table_key = fmt, codec
-            inner_key = (writing_library, reading_library)
+            inner_key = (', '.join(writing_library, nstr), reading_library)
         else:
             table_key = fmt
-            inner_key = (', '.join((writing_library, codec)), reading_library)
+            inner_key = (', '.join((writing_library, codec, nstr)),
+                         reading_library)
 
         if table_key not in all_results:
             all_results[table_key] = {}
