@@ -154,8 +154,8 @@ def _get_read_fn(fmt, writing_library, reading_library, nested_str):
 
 @pytest.mark.parametrize(argnames, params, ids=ids)
 def test_correct_read(fmt, writing_library, reading_library, codec, nested):
-    if nested and reading_library not in ['zarr', 'zarrita']:
-        pytest.skip("nested read not implemented")
+    if nested and reading_library == 'z5py':
+        pytest.skip("nested read not implemented in z5py")
 
     reference = imread(DATA_DIR / "reference_image.png")
     nested_str = "_nested" if nested else ""
