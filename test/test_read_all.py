@@ -249,7 +249,7 @@ def result_to_table(result, use_emojis=True, fmt='md'):
                 df_val = pass_str if v else f'{fail_str}: mismatched'
             else:
                 df_val = pass_str if v else fail_str
-        df.at[k[0], k[1]] = df_val\
+        df.at[k[0], k[1]] = df_val
 
     if fmt == 'html':
         table = df.to_html()
