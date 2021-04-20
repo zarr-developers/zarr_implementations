@@ -12,6 +12,25 @@ When a new library, format, or codec is added, update
 The matrix of tests is automatically generated,
 and individual tests correctly fail on unavailable imports.
 Call ``pytest`` in the root directory to run all of the tests.
+
+The tests in this folder assume that the data generation scripts generate
+filenames named as follows:
+
+{writing_library}.{fmt}
+
+where {fmt} is '.n5', '.zr' or '.zr3'.
+
+For writers where multiple store and/or file nesting formats are tested, the
+following filenaming scheme is used in the generators:
+
+{writing_library}_{storage_class_name}_{nesting_type}.{fmt}
+
+'_{storage_class_name}' is optional and is currently used by the zarr-python
+implementations to indicate which storage class was used to write the data.
+
+'_{nesting_type}' should be either '_nested' or '_flat' to indicate if a
+nested or flat chunk storage scheme is used.
+
 """
 import os
 from typing import Dict, List
@@ -50,15 +69,19 @@ def read_with_zarr(fpath, ds_name, nested):
     import zarr
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    if nested:
-        # Need to fix zarr-python upstream to respect key_separator for FSStore
-        use_fsstore = False
-        if use_fsstore:
-            store = zarr.storage.FSStore(
-                os.fspath(fpath), key_separator='/', mode='r'
-            )
+    if str(fpath).endswith('.zr'):
+        if nested:
+            if 'FSStore' in str(fpath):
+                store = zarr.storage.FSStore(
+                    os.fspath(fpath), key_separator='/', mode='r'
+                )
+            else:
+                store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
         else:
-            store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
+            if 'FSStore' in str(fpath):
+                store = zarr.storage.FSStore(os.fspath(fpath))
+            else:
+                store = zarr.storage.DirectoryStore(fpath)
     else:
         store = os.fspath(fpath)
     return zarr.open(store)[ds_name][:]
@@ -96,6 +119,9 @@ EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
 HERE = Path(__file__).resolve().parent
 DATA_DIR = HERE.parent / "data"
 
+# Optional filename strings indicating a specific storage class was used
+KNOWN_STORAGE_CLASSES = {"DirectoryStore", "FSStore", "NestedDirectoryStore"}
+
 
 def libraries_for_format(format: str):
     return {
@@ -113,15 +139,45 @@ def codecs_for_file(fpath: Path):
         return sorted(d.name for d in fpath.iterdir() if d.is_dir())
 
 
+def _get_write_attrs(file_stem: str):
+    """Parse a filename to determine the writing library name
+
+    If present in the filename, the storage class and nesting type are also
+    determined.
+    """
+    nested_str = ""
+    if "nested" in file_stem:
+        nested_str = "nested"
+        writing_library = file_stem.replace("_nested", "")
+    else:
+        writing_library = file_stem
+
+    if "_flat" in file_stem:
+        writing_library = file_stem.replace("_flat", "")
+
+    store_str = ""
+    for store_name in KNOWN_STORAGE_CLASSES:
+        _store_name = '_' + store_name
+        if _store_name in writing_library:
+            if store_str:
+                raise ValueError(
+                    f"multiple store names in file_stem: {file_stem}"
+                )
+            store_str = store_name
+            writing_library = writing_library.replace(_store_name, "")
+
+    return writing_library, store_str, nested_str
+
+
 def create_params():
-    argnames = ["fmt", "writing_library", "reading_library", "codec", "nested"]
+    argnames = ["fmt", "writing_library", "reading_library", "codec", "nested",
+                "store_name", "fpath"]
     params = []
     ids = []
     for fmt in EXTENSIONS:
         for file_stem, fpath in libraries_for_format(fmt).items():
-            nested = "_nested" in file_stem
-            writing_library = file_stem.replace("_nested", "")
-            nested_str = "nested" if nested else ""
+            writing_library, store_str, nested_str = _get_write_attrs(file_stem)
+            nested = nested_str == "nested"
             written_codecs = codecs_for_file(fpath)
             for reading_library, available_fmts in READABLE_CODECS.items():
                 available_codecs = available_fmts.get(fmt, [])
@@ -129,10 +185,16 @@ def create_params():
                     set(available_codecs).intersection(written_codecs)
                 ):
                     params.append(
-                        (fmt, writing_library, reading_library, codec, nested)
+                        (fmt, writing_library, reading_library, codec, nested,
+                         store_str, fpath)
                     )
+                    write_attrs = ', '.join(
+                        [s for s in (store_str, nested_str) if s != ""]
+                    )
+                    if write_attrs:
+                        write_attrs = ' (' + write_attrs + ')'
                     ids.append(
-                        f"read {nested_str} {writing_library} {fmt} using "
+                        f"read {writing_library}{write_attrs} {fmt} using "
                         f"{reading_library}, {codec}"
                     )
     return argnames, params, ids
@@ -141,26 +203,29 @@ def create_params():
 argnames, params, ids = create_params()
 
 
-def _get_read_fn(fmt, writing_library, reading_library, nested_str):
-    fpath = DATA_DIR / f"{writing_library}{nested_str}{EXTENSIONS[fmt]}"
+def _get_read_fn(reading_library):
     read_fn = {
         "zarr": read_with_zarr,
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
     }[reading_library]
-    return fpath, read_fn
+    return read_fn
 
 
 @pytest.mark.parametrize(argnames, params, ids=ids)
-def test_correct_read(fmt, writing_library, reading_library, codec, nested):
+def test_correct_read(fmt, writing_library, reading_library, codec, nested,
+                      store_name, fpath):
     if nested and reading_library == 'z5py':
         pytest.skip("nested read not implemented in z5py")
 
     reference = imread(DATA_DIR / "reference_image.png")
-    nested_str = "_nested" if nested else ""
-    fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library,
-                                  nested_str)
+    read_fn = _get_read_fn(reading_library)
+    if not os.path.exists(fpath):
+        raise RuntimeError(
+            f"file not found: {fpath}. Make sure you have generated the data "
+            "using 'make data'"
+        )
     test = read_fn(fpath, codec, nested)
     assert test.shape == reference.shape
     assert np.allclose(test, reference)
@@ -170,10 +235,9 @@ def tabulate_test_results(params, per_codec_tables=False):
     reference = imread(DATA_DIR / "reference_image.png")
 
     all_results = {}
-    for fmt, writing_library, reading_library, codec, nested in params:
-        nested_str = "_nested" if nested else ""
-        fpath, read_fn = _get_read_fn(fmt, writing_library, reading_library,
-                                      nested_str)
+    for (fmt, writing_library, reading_library, codec, nested, store_name,
+            fpath) in params:
+        read_fn = _get_read_fn(reading_library)
         fail_type = None
         try:
             test = read_fn(fpath, codec, nested)
@@ -189,11 +253,14 @@ def tabulate_test_results(params, per_codec_tables=False):
         nstr = 'nested' if nested else 'flat'
         if per_codec_tables:
             table_key = fmt, codec
-            inner_key = (', '.join(writing_library, nstr), reading_library)
+            inner_key = (', '.join(writing_library, store_name, nstr), reading_library)
         else:
             table_key = fmt
-            inner_key = (', '.join((writing_library, codec, nstr)),
-                         reading_library)
+            if store_name:
+                key_attributes = (writing_library, codec, store_name, nstr)
+            else:
+                key_attributes = (writing_library, codec, nstr)
+            inner_key = (', '.join(key_attributes), reading_library)
 
         if table_key not in all_results:
             all_results[table_key] = {}
