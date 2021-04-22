@@ -4,6 +4,10 @@ test: data
 data/reference_image.png:
 	python generate_reference_image.py
 
+.PHONY: jzarr
+jzarr: data/reference_image.png
+	bash generate_data/jzarr/generate_data.sh
+
 .PHONY: n5java
 n5java: data/reference_image.png
 	bash generate_data/n5-java/generate_data.sh
@@ -33,7 +37,7 @@ xtensor_zarr: data/reference_image.png
 	bash generate_data/xtensor_zarr/generate_data.sh
 
 .PHONY: data
-data: n5java pyn5 z5py zarr js xtensor_zarr zarrita
+data: jzarr n5java pyn5 z5py zarr js xtensor_zarr zarrita
 
 .PHONY: test
 
