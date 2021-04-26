@@ -7,7 +7,7 @@ When a new library, format, or codec is added, update
 * READABLE_CODECS.{library_name}.{format_name}[{codec1}, {codec2}, ...]
 * Write a function which takes a container path and dataset name,
   and returns a numpy-esque array
-* Add it to READ_FNS under the {library_name} key
+* Add it to _get_read_fn under the {library_name} key
 
 The matrix of tests is automatically generated,
 and individual tests correctly fail on unavailable imports.
@@ -33,6 +33,7 @@ nested or flat chunk storage scheme is used.
 
 """
 import os
+import subprocess
 from typing import Dict, List
 from pathlib import Path
 from skimage.io import imread
@@ -42,6 +43,10 @@ import pytest
 
 
 READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
+    "jzarr": {
+        "jzarr": ["blosc", "raw", "zlib"],
+        "zarr": ["blosc", "raw", "zlib"],
+    },
     "z5py": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
         "zarr-v3": [],
@@ -63,6 +68,35 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "N5": [],
     }
 }
+
+
+def execute(cmd):
+    popen = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        universal_newlines=True,
+        shell=True,
+    )
+
+    for stdout_line in iter(popen.stdout.readline, ""):
+        yield stdout_line
+
+    popen.stdout.close()
+    return_code = popen.wait()
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, cmd)
+
+
+def read_with_jzarr(fpath, ds_name, nested=None):
+    execute(
+        [
+            "generate_data/jzarr/generate_data.sh",
+            "-verify",
+            str(fpath),
+            ds_name
+        ],
+    )
+    return None
 
 
 def read_with_zarr(fpath, ds_name, nested):
@@ -105,14 +139,6 @@ def read_with_zarrita(fpath, ds_name, nested):
         ds_name = "blosc/lz4"
     h = zarrita.get_hierarchy(str(fpath.absolute()))
     return h["/" + ds_name][:]
-
-
-READ_FNS = {
-    "zarr": read_with_zarr,
-    "zarrita": read_with_zarrita,
-    "pyn5": read_with_pyn5,
-    "z5py": read_with_z5py,
-}
 
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
@@ -205,6 +231,7 @@ argnames, params, ids = create_params()
 
 def _get_read_fn(reading_library):
     read_fn = {
+        "jzarr": read_with_jzarr,
         "zarr": read_with_zarr,
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
@@ -227,8 +254,11 @@ def test_correct_read(fmt, writing_library, reading_library, codec, nested,
             "using 'make data'"
         )
     test = read_fn(fpath, codec, nested)
-    assert test.shape == reference.shape
-    assert np.allclose(test, reference)
+    # Assume that the if nothing is returned,
+    # the read function has verify itself.
+    if test is not None:
+        assert test.shape == reference.shape
+        assert np.allclose(test, reference)
 
 
 def tabulate_test_results(params, per_codec_tables=False):

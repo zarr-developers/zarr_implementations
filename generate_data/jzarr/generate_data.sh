@@ -3,4 +3,4 @@
 cd "${0%/*}"
 
 mvn clean package
-java -cp target/jzarr-1.0.0.jar zarr_implementations.jzarr.App
+java -cp target/jzarr-1.0.0.jar zarr_implementations.jzarr.App "$@"
