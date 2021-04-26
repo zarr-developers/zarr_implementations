@@ -20,6 +20,13 @@
       <version>0.3.2</version>
     </dependency>
   </dependencies>
+  <repositories>
+     <repository>
+        <id>bc-nexus-repo</id>
+        <name>Brockmann-Consult Public Maven Repository</name>
+        <url>https://nexus.senbox.net/nexus/content/groups/public/</url>
+     </repository>
+  </repositories>
   <build>
     <plugins>
       <plugin>
