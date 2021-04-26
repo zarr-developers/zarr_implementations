@@ -71,6 +71,9 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
 
 
 def execute(cmd):
+    """
+    Similar to subprocess.check_call but print stdout during execution.
+    """
     popen = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
@@ -254,8 +257,7 @@ def test_correct_read(fmt, writing_library, reading_library, codec, nested,
             "using 'make data'"
         )
     test = read_fn(fpath, codec, nested)
-    # Assume that the if nothing is returned,
-    # the read function has verify itself.
+    # Assume if None is returned, the read function has verified.
     if test is not None:
         assert test.shape == reference.shape
         assert np.allclose(test, reference)
