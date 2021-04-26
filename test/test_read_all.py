@@ -112,7 +112,7 @@ def read_with_zarrita(fpath, ds_name, nested):
     h = zarrita.get_hierarchy(str(fpath.absolute()))
     return h["/" + ds_name][:]
 
-def read_with_xtensor_zarr(fpath, ds_name):
+def read_with_xtensor_zarr(fpath, ds_name, nested):
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
     fname = "a.npz"
