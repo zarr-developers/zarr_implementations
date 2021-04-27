@@ -78,10 +78,10 @@ public class App {
             String dsname = args[2];
             ZarrArray verification = ZarrGroup.open(fpath).openArray(dsname);
             int[] shape = verification.getShape();
-            if (!Arrays.equals(new int[]{}, shape)) {
+            if (!Arrays.equals(SHAPE, shape)) {
                 throw new RuntimeException(String.format(
-                            "shape-mismatch expected:{} found:{}",
-                            SHAPE, shape
+                            "shape-mismatch expected:%s found:%s",
+                            Arrays.toString(SHAPE), Arrays.toString(shape)
                 ));
             }
             return;  // EARLY EXIT
