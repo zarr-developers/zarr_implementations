@@ -73,7 +73,7 @@ def read_with_zarr(fpath, ds_name, nested):
         if nested:
             if 'FSStore' in str(fpath):
                 store = zarr.storage.FSStore(
-                    os.fspath(fpath), key_separator='/', mode='r'
+                    os.fspath(fpath), dimension_separator='/', mode='r'
                 )
             else:
                 store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
