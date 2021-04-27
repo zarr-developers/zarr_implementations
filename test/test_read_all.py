@@ -294,8 +294,12 @@ def tabulate_test_results(params, per_codec_tables=False):
             fail_type = f"{type(e).__name__}: {e}"
 
         if fail_type is None:
-            result = test.shape == reference.shape
-            result = result and np.allclose(test, reference)
+            if test is None:
+                # Assume implementation handled the verification
+                result = True
+            else:
+                result = test.shape == reference.shape
+                result = result and np.allclose(test, reference)
         else:
             result = fail_type
 
