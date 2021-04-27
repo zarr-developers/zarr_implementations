@@ -33,6 +33,7 @@ nested or flat chunk storage scheme is used.
 
 """
 import os
+import subprocess
 from typing import Dict, List
 from pathlib import Path
 from skimage.io import imread
@@ -61,7 +62,12 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "zarr": [],
         "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
         "N5": [],
-    }
+    },
+    "xtensor_zarr": {
+        "zarr": ["blosc", "gzip", "raw", "zlib"],
+        "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
+        "N5": [],
+    },
 }
 
 
@@ -106,12 +112,22 @@ def read_with_zarrita(fpath, ds_name, nested):
     h = zarrita.get_hierarchy(str(fpath.absolute()))
     return h["/" + ds_name][:]
 
+def read_with_xtensor_zarr(fpath, ds_name, nested):
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+    fname = "a.npz"
+    if os.path.exists(fname):
+        os.remove(fname)
+    subprocess.check_call(["generate_data/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
+    return np.load(fname)["a"]
+
 
 READ_FNS = {
     "zarr": read_with_zarr,
     "zarrita": read_with_zarrita,
     "pyn5": read_with_pyn5,
     "z5py": read_with_z5py,
+    "xtensor_zarr": read_with_xtensor_zarr,
 }
 
 
@@ -209,6 +225,7 @@ def _get_read_fn(reading_library):
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
+        "xtensor_zarr": read_with_xtensor_zarr,
     }[reading_library]
     return read_fn
 

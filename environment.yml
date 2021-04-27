@@ -6,13 +6,12 @@ dependencies:
   - maven
   - make
   - cmake
-  - xtensor-zarr=0.0.3=*_1
-  - xtensor != 0.23.5
+  - xtensor-zarr=0.0.4
   - openimageio
   - zlib
   - blosc
   - nodejs
-  - z5py >= 2.0.8
+  - z5py >= 2.0.10
   - python == 3.7.9
   - scikit-image
   - pytest
