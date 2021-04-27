@@ -46,6 +46,8 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
     "jzarr": {
         "jzarr": ["blosc", "raw", "zlib"],
         "zarr": ["blosc", "raw", "zlib"],
+        "xtensor_zarr": ["blosc", "raw", "zlib"],
+        "z5py": ["blosc", "raw", "zlib"],
     },
     "z5py": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
@@ -66,7 +68,12 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "zarr": [],
         "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
         "N5": [],
-    }
+    },
+    "xtensor_zarr": {
+        "zarr": ["blosc", "gzip", "raw", "zlib"],
+        "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
+        "N5": [],
+    },
 }
 
 
@@ -110,7 +117,7 @@ def read_with_zarr(fpath, ds_name, nested):
         if nested:
             if 'FSStore' in str(fpath):
                 store = zarr.storage.FSStore(
-                    os.fspath(fpath), key_separator='/', mode='r'
+                    os.fspath(fpath), dimension_separator='/', mode='r'
                 )
             else:
                 store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
@@ -142,6 +149,15 @@ def read_with_zarrita(fpath, ds_name, nested):
         ds_name = "blosc/lz4"
     h = zarrita.get_hierarchy(str(fpath.absolute()))
     return h["/" + ds_name][:]
+
+def read_with_xtensor_zarr(fpath, ds_name, nested):
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+    fname = "a.npz"
+    if os.path.exists(fname):
+        os.remove(fname)
+    subprocess.check_call(["generate_data/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
+    return np.load(fname)["a"]
 
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
@@ -239,6 +255,7 @@ def _get_read_fn(reading_library):
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
+        "xtensor_zarr": read_with_xtensor_zarr,
     }[reading_library]
     return read_fn
 

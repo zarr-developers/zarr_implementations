@@ -20,7 +20,7 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
         (False, zarr.storage.FSStore, {}),
         (True, zarr.storage.NestedDirectoryStore, {}),
         (True, zarr.storage.FSStore,
-         {'key_separator': '/', 'auto_mkdir': True}),
+         {'dimension_separator': '/', 'auto_mkdir': True}),
     ]:
 
         nested_str = '_nested' if nested else '_flat'
