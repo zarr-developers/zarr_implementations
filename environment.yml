@@ -15,7 +15,7 @@ dependencies:
   - python == 3.7.9
   - scikit-image
   - pytest
-  - zarr >= 2.4.0
+  - zarr >= 2.8.0
   - pip
   - pandas
   - tabulate
