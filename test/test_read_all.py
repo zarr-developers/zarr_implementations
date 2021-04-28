@@ -77,35 +77,17 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
 }
 
 
-def execute(cmd):
-    """
-    Similar to subprocess.check_call but print stdout during execution.
-    """
-    popen = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        universal_newlines=True,
-        shell=True,
-    )
-
-    for stdout_line in iter(popen.stdout.readline, ""):
-        yield stdout_line
-
-    popen.stdout.close()
-    return_code = popen.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(return_code, cmd)
-
-
 def read_with_jzarr(fpath, ds_name, nested=None):
-    execute(
-        [
-            "generate_data/jzarr/generate_data.sh",
-            "-verify",
-            str(fpath),
-            ds_name
-        ],
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+
+    cmd = (
+        f"generate_data/jzarr/generate_data.sh "
+        f"-verify {str(fpath)} {ds_name}"
     )
+
+    # will raise subprocess.CalledProcessError if return code is not 0
+    subprocess.check_output(cmd, shell=True)
     return None
 
 
