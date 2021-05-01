@@ -6,7 +6,8 @@ dependencies:
   - maven
   - make
   - cmake
-  - xtensor-zarr=0.0.4
+  - xtensor-zarr=0.0.7
+  - gdal
   - openimageio
   - zlib
   - blosc
