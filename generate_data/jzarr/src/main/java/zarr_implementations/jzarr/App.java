@@ -52,7 +52,7 @@ public class App {
     private static final Path IN_PATH = Paths.get("..", "..", "data", "reference_image.png");
     private static final Path OUT_PATH = Paths.get("..", "..", "data", "jzarr_flat.zr");
 
-    private static int[] getData() throws IOException {
+    private static int[] getTestData() throws IOException {
         final BufferedImage image = ImageIO.read(new File(IN_PATH.toString()));
         int[] result = new int[WIDTH * HEIGHT * CHANNELS];
         for (int i = 0; i < WIDTH; i++) {
@@ -65,6 +65,13 @@ public class App {
             }
         }
         return result;
+    }
+
+
+    private static int[] getArrayData(ZarrArray zarr) throws Exception {
+        int[] data = new int[WIDTH * HEIGHT * CHANNELS];
+        zarr.read(data, SHAPE, new int[]{0, 0, 0});
+        return data;
     }
 
     public static void main(String args[]) throws Exception {
@@ -84,10 +91,17 @@ public class App {
                             Arrays.toString(SHAPE), Arrays.toString(shape)
                 ));
             }
+
+            int[] test = getTestData();
+            int[] verify = getArrayData(verification);
+            if (!Arrays.equals(test, verify)) {
+                throw new RuntimeException(String.format(
+                            "values don't match"));
+            }
             return;  // EARLY EXIT
         }
 
-        int[] data = getData();
+        int[] data = getTestData();
 
         final ZarrGroup container = ZarrGroup.create(OUT_PATH);
         for (final Compression compressionType : Compression.values()) {
