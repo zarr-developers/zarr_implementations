@@ -44,10 +44,9 @@ import pytest
 
 READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
     "jzarr": {
-        "jzarr": ["blosc", "raw", "zlib"],
         "zarr": ["blosc", "raw", "zlib"],
-        "xtensor_zarr": ["blosc", "raw", "zlib"],
-        "z5py": ["blosc", "raw", "zlib"],
+        "zarr-v3": [],
+        "N5": [],
     },
     "z5py": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
