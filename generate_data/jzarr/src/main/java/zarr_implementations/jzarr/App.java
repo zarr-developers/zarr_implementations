@@ -71,7 +71,11 @@ public class App {
     private static int[] getArrayData(ZarrArray zarr) throws Exception {
         int[] data = new int[WIDTH * HEIGHT * CHANNELS];
         zarr.read(data, SHAPE, new int[]{0, 0, 0});
-        return data;
+        int[] unsigned = new int[data.length];
+        for (int i = 0; i < data.length; i++) {
+            unsigned[i] = data[i] & 0xff;
+        }
+        return unsigned;
     }
 
     public static void main(String args[]) throws Exception {
