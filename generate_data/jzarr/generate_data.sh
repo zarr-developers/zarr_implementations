@@ -6,7 +6,9 @@ set -e
 set -u
 set -x
 
-mvn clean package
+MVN_FLAGS=${MVN_FLAGS:-"--no-transfer-progress"}
+mvn "${MVN_FLAGS}" clean package
+
 java -cp target/jzarr-1.0.0.jar zarr_implementations.jzarr.App "$@" && {
     # Workaround for: https://github.com/bcdev/jzarr/issues/25
     find ../../data/jzarr* -name .zarray -exec sed -ibak 's/>u1/|u1/' {} \;
