@@ -7,7 +7,7 @@ When a new library, format, or codec is added, update
 * READABLE_CODECS.{library_name}.{format_name}[{codec1}, {codec2}, ...]
 * Write a function which takes a container path and dataset name,
   and returns a numpy-esque array
-* Add it to READ_FNS under the {library_name} key
+* Add it to _get_read_fn under the {library_name} key
 
 The matrix of tests is automatically generated,
 and individual tests correctly fail on unavailable imports.
@@ -43,6 +43,11 @@ import pytest
 
 
 READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
+    "jzarr": {
+        "zarr": ["blosc", "raw", "zlib"],
+        "zarr-v3": [],
+        "N5": [],
+    },
     "z5py": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
         "zarr-v3": [],
@@ -69,6 +74,20 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "N5": [],
     },
 }
+
+
+def read_with_jzarr(fpath, ds_name, nested=None):
+    if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+
+    cmd = (
+        f"generate_data/jzarr/generate_data.sh "
+        f"-verify {str(fpath)} {ds_name}"
+    )
+
+    # will raise subprocess.CalledProcessError if return code is not 0
+    subprocess.check_output(cmd, shell=True)
+    return None
 
 
 def read_with_zarr(fpath, ds_name, nested):
@@ -120,15 +139,6 @@ def read_with_xtensor_zarr(fpath, ds_name, nested):
         os.remove(fname)
     subprocess.check_call(["generate_data/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
     return np.load(fname)["a"]
-
-
-READ_FNS = {
-    "zarr": read_with_zarr,
-    "zarrita": read_with_zarrita,
-    "pyn5": read_with_pyn5,
-    "z5py": read_with_z5py,
-    "xtensor_zarr": read_with_xtensor_zarr,
-}
 
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
@@ -221,6 +231,7 @@ argnames, params, ids = create_params()
 
 def _get_read_fn(reading_library):
     read_fn = {
+        "jzarr": read_with_jzarr,
         "zarr": read_with_zarr,
         "pyn5": read_with_pyn5,
         "z5py": read_with_z5py,
@@ -244,8 +255,10 @@ def test_correct_read(fmt, writing_library, reading_library, codec, nested,
             "using 'make data'"
         )
     test = read_fn(fpath, codec, nested)
-    assert test.shape == reference.shape
-    assert np.allclose(test, reference)
+    # Assume if None is returned, the read function has verified.
+    if test is not None:
+        assert test.shape == reference.shape
+        assert np.allclose(test, reference)
 
 
 def tabulate_test_results(params, per_codec_tables=False):
@@ -262,8 +275,12 @@ def tabulate_test_results(params, per_codec_tables=False):
             fail_type = f"{type(e).__name__}: {e}"
 
         if fail_type is None:
-            result = test.shape == reference.shape
-            result = result and np.allclose(test, reference)
+            if test is None:
+                # Assume implementation handled the verification
+                result = True
+            else:
+                result = test.shape == reference.shape
+                result = result and np.allclose(test, reference)
         else:
             result = fail_type
 
