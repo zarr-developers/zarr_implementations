@@ -1,6 +1,7 @@
 import fs from "fs";
 import p from "path";
-import { PNG } from "pngjs";
+import pkg from "pngjs";
+const { PNG } = pkg;
 
 import { openGroup, NestedArray, slice } from "zarr";
 import FSStore from "./fsstore.js";
@@ -37,7 +38,7 @@ async function generateZarrFormat(codecIds = ["gzip", "blosc", "zlib", null]) {
   const path = p.join("..", "..", "data", "js.zr");
   const img = imread(p.join("..", "..", "data", "reference_image.png"));
 
-  fs.rmSync(path, { recursive: true, force: true });
+  fs.rmdirSync(path, { recursive: true, force: true });
   const grp = await open(path);
   for (const id of codecIds) {
     const config = id ? STR_TO_COMPRESSOR[id] : null;

@@ -82,6 +82,7 @@ endif()
 target_link_libraries(run_xtensor_zarr
     PUBLIC
     xtensor-zarr
+    xtensor-zarr-gdal
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
 )
