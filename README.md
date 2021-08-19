@@ -22,3 +22,4 @@ Test for compatability.
 * [TensorStore](https://google.github.io/tensorstore/driver/zarr/index.html) #20
 * [Zarr.jl](https://github.com/meggart/Zarr.jl) #42
 * https://github.com/freeman-lab/zarr-js
+* [GDAL >= 3.4](https://gdal.org/drivers/raster/zarr.html)
