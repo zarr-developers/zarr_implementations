@@ -13,10 +13,10 @@ dependencies:
   - python == 3.7.9
   - scikit-image
   - pytest
-  - zarr >= 2.8.3
   - pip
   - pandas
   - tabulate
   - pip:
       - pyn5
       - git+https://github.com/grlee77/zarrita.git@codec_update
+      - git+https://github.com/joshmoore/zarr-python.git@fix-dstore
