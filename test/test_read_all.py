@@ -307,8 +307,8 @@ def tabulate_test_results(params, per_codec_tables=False):
 def result_to_table(result, use_emojis=True, fmt='md'):
     """Generate a markdown style table
 
-    Parmaters
-    ---------
+    Parameters
+    ----------
     result : dict
         Dict where the keys are a 2-tuple of strings indicating the
         (index, column) labels and the values are the value at that location.
@@ -363,8 +363,8 @@ def result_to_table(result, use_emojis=True, fmt='md'):
 def concatenate_tables(all_results, use_emojis=True, fmt='md'):
     """Generate a report containing markdown-style tables
 
-    Parmaters
-    ---------
+    Parameters
+    ----------
     all_results : dict
         Dict of test results as returned by generate_report
     use_emojis : bool, optional
@@ -406,7 +406,7 @@ def concatenate_tables(all_results, use_emojis=True, fmt='md'):
             report += result_to_table(res, use_emojis=use_emojis, fmt=fmt)
             report += '\n\n\n'
     else:
-        raise ValueError(f"unkown fmt: '{fmt}'. Must be 'md' or 'html'")
+        raise ValueError(f"unknown fmt: '{fmt}'. Must be 'md' or 'html'")
 
     return report
 
