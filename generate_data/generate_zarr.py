@@ -33,14 +33,15 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
 
         nested_str = '_nested' if nested else '_flat'
         path = f'data/zarr_{StoreClass.__name__}{nested_str}.zr'
+        zarr_version = StoreClass._store_version
+        if zarr_version == 3:
+            path = path.replace('.zr', '.zr3')
         store = StoreClass(path, **store_kwargs)
         im = astronaut()
 
-        zarr_version = StoreClass._store_version
-        # must specify a top-level group path for zarr.open when using zarr-v3
-        path = None if zarr_version == 2 else 'astronaut'
-
-        f = zarr.open(store, path=path, mode='w')
+        if zarr_version == 2:
+            # can't open a group without an explicit `path` on v3
+            f = zarr.open(store, mode='w')
         for compressor in compressors:
             copts = COMPRESSION_OPTIONS.get(compressor, {})
             if compressor is None:
@@ -50,8 +51,14 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
             else:
                 name = compressor
             compressor_impl = STR_TO_COMPRESSOR[compressor](**copts) if compressor is not None else None
-            f.create_dataset(name, data=im, chunks=CHUNKS,
-                             compressor=compressor_impl)
+            if zarr_version == 2:
+                f.create_dataset(name, data=im, chunks=CHUNKS,
+                                 compressor=compressor_impl)
+            else:
+                # Note: dimension_separator will be inferred from store
+                x = zarr.open_array(store, path=name, mode='w', shape=im.shape,
+                                    chunks=CHUNKS, compressor=compressor_impl)
+                x[:] = im
 
 
 def generate_n5_format(compressors=['gzip', None]):
