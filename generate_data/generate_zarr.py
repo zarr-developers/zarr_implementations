@@ -56,9 +56,9 @@ def generate_zarr_format(compressors=['gzip', 'blosc', 'zlib', None]):
                                  compressor=compressor_impl)
             else:
                 # Note: dimension_separator will be inferred from store
-                x = zarr.open_array(store, path=name, mode='w', shape=im.shape,
-                                    chunks=CHUNKS, compressor=compressor_impl)
-                x[:] = im
+                x = zarr.array(im, store=store, path=name, shape=im.shape,
+                               chunks=CHUNKS, compressor=compressor_impl,
+                               overwrite=True)
 
 
 def generate_n5_format(compressors=['gzip', None]):
