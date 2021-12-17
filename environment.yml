@@ -1,4 +1,3 @@
-name: zarr_impl
 channels:
   - conda-forge
   - defaults
