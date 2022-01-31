@@ -17,8 +17,8 @@ Test for compatibility.
 
 ## Other implementations
 
-* NetCDF-C #35
-* NetCDF-Java #40
+* [NetCDF-C](https://github.com/Unidata/netcdf-c) #35
+* [NetCDF-Java](https://github.com/Unidata/netcdf-java) #40
 * [TensorStore](https://google.github.io/tensorstore/driver/zarr/index.html) #20
 * [Zarr.jl](https://github.com/meggart/Zarr.jl) #42
 * https://github.com/freeman-lab/zarr-js
