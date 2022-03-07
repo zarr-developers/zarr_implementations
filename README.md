@@ -1,7 +1,7 @@
 # Zarr Implementations
 
 Collect data in zarr / n5 format written by different implementations.
-Test for compatibility.
+Test for compatibility. See [doc/development_overview.md](doc/development_overview.md) for details.
 
 ## Implementations currently tested
 
