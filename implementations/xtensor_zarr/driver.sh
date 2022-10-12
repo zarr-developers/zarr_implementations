@@ -1,6 +1,14 @@
-# cd to this directory
-# https://stackoverflow.com/a/6393573/2700168
-cd "${0%/*}"
+ENVNAME=ZI_xtensor_zarr
+
+# Standard bootstrapping
+IMPL=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT=$( dirname $IMPL)
+. $ROOT/.conda_driver.sh
+create_or_activate
+
+cd "${IMPL}"
+
+set +u # Due to GDAL_DATA
 
 rm -rf build
 mkdir build

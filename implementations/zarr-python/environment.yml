@@ -2,14 +2,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - openimageio
-  - python == 3.7.9
+  - python
   - scikit-image
-  - pytest
-  - zarr >= 2.8.3
-  - pip
-  - pandas
-  - tabulate
-  - pip:
-      - pyn5
-      - git+https://github.com/grlee77/zarrita.git@codec_update
+  - zarr

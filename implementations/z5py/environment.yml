@@ -2,10 +2,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - rust
-  - maturin
+  - z5py
   - python
   - scikit-image
-  - pip
-  - pip:
-      - pyn5

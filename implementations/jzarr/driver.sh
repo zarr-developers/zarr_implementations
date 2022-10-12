@@ -1,10 +1,15 @@
 # cd to this directory
 # https://stackoverflow.com/a/6393573/2700168
-cd "${0%/*}"
 
-set -e
-set -u
-set -x
+ENVNAME=ZI_jzarr
+
+# Standard bootstrapping
+IMPL=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT=$( dirname $IMPL)
+. $ROOT/.conda_driver.sh
+create_or_activate
+
+cd "${IMPL}"
 
 MVN_FLAGS=${MVN_FLAGS:-"--no-transfer-progress"}
 mvn "${MVN_FLAGS}" clean package
@@ -16,4 +21,3 @@ java -cp target/jzarr-1.0.0.jar zarr_implementations.jzarr.App "$@" && {
     echo jzarr failed
     exit 2
 }
-
