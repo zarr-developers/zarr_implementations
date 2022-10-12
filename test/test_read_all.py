@@ -81,7 +81,7 @@ def read_with_jzarr(fpath, ds_name, nested=None):
         ds_name = "blosc/lz4"
 
     cmd = (
-        f"generate_data/jzarr/generate_data.sh "
+        f"implementations/jzarr/generate_data.sh "
         f"-verify {str(fpath)} {ds_name}"
     )
 
@@ -137,7 +137,7 @@ def read_with_xtensor_zarr(fpath, ds_name, nested):
     fname = "a.npz"
     if os.path.exists(fname):
         os.remove(fname)
-    subprocess.check_call(["generate_data/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
+    subprocess.check_call(["implementations/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
     return np.load(fname)["a"]
 
 

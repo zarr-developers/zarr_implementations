@@ -1,6 +1,6 @@
 target*
 __pycache__/
-generate_data/xtensor_zarr/build
+implemnetations/xtensor_zarr/build
 node_modules/
 report.*
 
