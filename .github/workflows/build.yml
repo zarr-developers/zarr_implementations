@@ -38,7 +38,7 @@ jobs:
         with:
           auto-update-conda: true
           channels: conda-forge,ome
-          environment-file: ${{ matrix.implementation }}/environment.yml
+          environment-file: implementations/${{ matrix.implementation }}/environment.yml
           python-version: ${{ matrix.python-version }}
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -59,4 +59,4 @@ jobs:
 
       - name: Run tests
         shell: bash -l {0}
-        run: make ${{ matrix.implementation }}
+        run: make implementations/${{ matrix.implementation }}
