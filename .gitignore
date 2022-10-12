@@ -6,3 +6,4 @@ report.*
 
 # ignore data subdirectories
 data/**/
+*iml
