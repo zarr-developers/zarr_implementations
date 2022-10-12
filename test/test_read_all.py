@@ -220,8 +220,8 @@ def create_params():
                     if write_attrs:
                         write_attrs = ' (' + write_attrs + ')'
                     ids.append(
-                        f"read {writing_library}{write_attrs} {fmt} using "
-                        f"{reading_library}, {codec}"
+                        f"W-{writing_library}{write_attrs} {fmt}_R-"
+                        f"{reading_library}_{codec}"
                     )
     return argnames, params, ids
 
