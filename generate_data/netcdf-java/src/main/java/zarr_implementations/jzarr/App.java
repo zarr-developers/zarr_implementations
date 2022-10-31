@@ -54,7 +54,7 @@ public class App {
 
     private static int[] getTestData() throws IOException {
 //        final BufferedImage image = ImageIO.read(new File(IN_PATH.toString()));
-        final BufferedImage image = ImageIO.read(new File("data/reference_image.png"));
+         final BufferedImage image = ImageIO.read(new File("data/reference_image.png"));
         int[] result = new int[WIDTH * HEIGHT * CHANNELS];
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
