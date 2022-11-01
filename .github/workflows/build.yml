@@ -24,7 +24,7 @@ jobs:
         platform: [ubuntu-latest]
         python-version: [3.9]
         zarr-python: [released]
-    needs: get_implementations
+    needs: [get_implementations]
     uses: ./.github/workflows/impl.yml
     with:
       implementation: ${{ matrix.implementation }}
@@ -41,7 +41,7 @@ jobs:
         platform: [ubuntu-latest]
         python-version: [3.9]
         zarr-python: [pre]
-    needs: test_implementations_released
+    needs: [get_implementations, test_implementations_released]
     uses: ./.github/workflows/impl.yml
     with:
       implementation: ${{ matrix.implementation }}
