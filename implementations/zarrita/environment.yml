@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python
   - scikit-image
+  - numcodecs
   - pip
   - pip:
       - git+https://github.com/grlee77/zarrita.git@codec_update
