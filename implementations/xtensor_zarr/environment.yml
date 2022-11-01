@@ -2,6 +2,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - python ==3.8
   - make
   - cmake
   - gdal ==3.0.4
