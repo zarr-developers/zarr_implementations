@@ -3,6 +3,8 @@ __pycache__/
 generate_data/xtensor_zarr/build
 node_modules/
 report.*
+*.iml
+.idea
 
 # ignore data subdirectories
 data/**/
