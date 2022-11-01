@@ -27,12 +27,12 @@ public class App {
 
     enum Compression {
         raw("null"),
-        zlib("zlib"),
-        blosc("blosc");
+        zlib("zlib");
+//        blosc("blosc");
 
         private final String value;
 
-        private Compression(final String value) {
+        Compression(final String value) {
             this.value = value;
         }
 
@@ -49,11 +49,12 @@ public class App {
     private static final int CHANNELS = 3;
     private static final int[] CHUNKS = new int[]{100, 100, 1};
     private static final int[] SHAPE = new int[] {WIDTH, HEIGHT, CHANNELS};
-    private static final Path IN_PATH = Paths.get("..", "..", "data", "reference_image.png");
+//    private static final Path IN_PATH = Paths.get("..", "..", "data", "reference_image.png");
     private static final Path OUT_PATH = Paths.get("..", "..", "data", "jzarr_flat.zr");
 
     private static int[] getTestData() throws IOException {
-        final BufferedImage image = ImageIO.read(new File(IN_PATH.toString()));
+//        final BufferedImage image = ImageIO.read(new File(IN_PATH.toString()));
+         final BufferedImage image = ImageIO.read(new File("data/reference_image.png"));
         int[] result = new int[WIDTH * HEIGHT * CHANNELS];
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
@@ -78,7 +79,7 @@ public class App {
         return unsigned;
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         if (args.length != 0 && args.length != 3) {
             System.out.println("usage: App");
@@ -91,8 +92,8 @@ public class App {
             int[] shape = verification.getShape();
             if (!Arrays.equals(SHAPE, shape)) {
                 throw new RuntimeException(String.format(
-                            "shape-mismatch expected:%s found:%s",
-                            Arrays.toString(SHAPE), Arrays.toString(shape)
+                        "shape-mismatch expected:%s found:%s",
+                        Arrays.toString(SHAPE), Arrays.toString(shape)
                 ));
             }
 
@@ -109,16 +110,18 @@ public class App {
         final ZarrGroup container = ZarrGroup.create(OUT_PATH);
         for (final Compression compressionType : Compression.values()) {
             ArrayParams arrayParams = new ArrayParams()
-                .shape(SHAPE)
-                .chunks(CHUNKS)
-                .dataType(DataType.u1)
-                // .nested(nested) FIXME: requires a different branch
-                .compressor(CompressorFactory.create(compressionType.toString()));  // jzarr name, "null"
+                    .shape(SHAPE)
+                    .chunks(CHUNKS)
+                    .dataType(DataType.u1)
+                    // .nested(nested) FIXME: requires a different branch
+                    .compressor(CompressorFactory.create(compressionType.toString()));  // jzarr name, "null"
 
             String dsname = compressionType.name(); // zarr_implementation name, "raw"
+
             if ("blosc".equals(dsname)) {
                 dsname = "blosc/lz4"; // FIXME: better workaround?
             }
+
             Path subdir = OUT_PATH.resolve(dsname);
             ZarrArray zArray = ZarrArray.create(subdir, arrayParams);
             // final ZarrArray zarr = ZarrArray.open(getRootPath().resolve(pathName));

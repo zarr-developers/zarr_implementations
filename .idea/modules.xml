@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/generate_data/jzarr/jzarr.iml" filepath="$PROJECT_DIR$/generate_data/jzarr/jzarr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/generate_data/netcdf-java/jzarr (1).iml" filepath="$PROJECT_DIR$/generate_data/netcdf-java/jzarr (1).iml" />
+      <module fileurl="file://$PROJECT_DIR$/generate_data/n5-java/n5_java.iml" filepath="$PROJECT_DIR$/generate_data/n5-java/n5_java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/zarr_implementations.iml" filepath="$PROJECT_DIR$/.idea/zarr_implementations.iml" />
+    </modules>
+  </component>
+</project>
