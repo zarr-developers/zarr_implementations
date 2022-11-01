@@ -4,4 +4,4 @@ channels:
 dependencies:
   - make
   - cmake
-  - xtensor-zarr >=0.0.8|=0.0.7=*_1
+  - xtensor-zarr
