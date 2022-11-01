@@ -4,4 +4,5 @@ channels:
 dependencies:
   - make
   - cmake
+  - gdal
   - xtensor-zarr
