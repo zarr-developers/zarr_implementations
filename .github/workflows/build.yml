@@ -27,7 +27,7 @@ jobs:
         platform: [ubuntu-latest]
         python-version: [3.9]
         implementation: ${{ fromJson(needs.get_implementations.outputs.matrix) }}
-        zarr-python: [released, pre]
+        zarr-python: [released]
 
     steps:
       - name: Checkout
@@ -60,3 +60,9 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: make implementations/${{ matrix.implementation }}
+
+  test_implementations_pre:
+    uses: ./github/workflows/build.yml
+    needs: test_implementations
+    with:
+      python: [pre]
