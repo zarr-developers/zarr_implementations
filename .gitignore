@@ -8,3 +8,16 @@ report.*
 
 # ignore data subdirectories
 data/**/
+.github
+.gitignore
+README.md
+environment.yml
+doc/**/
+examples/**/
+generate_data/jzarr/**/
+generate_data/js/**/
+generate_data/n5-java/**/
+xtensor_zarr/**/
+test/**/
+
+
