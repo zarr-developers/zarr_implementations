@@ -60,7 +60,7 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
     },
     "zarr": {
         "zarr": ["blosc", "gzip", "raw", "zlib"],
-        "zarr-v3": [],
+        "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
         "N5": ["gzip", "raw"],
     },
     "zarrita": {
@@ -107,6 +107,19 @@ def read_with_zarr(fpath, ds_name, nested):
                 store = zarr.storage.FSStore(os.fspath(fpath))
             else:
                 store = zarr.storage.DirectoryStore(fpath)
+        return zarr.open(store)[ds_name][:]
+    elif str(fpath).endswith('.zr3'):
+        dimension_separator = '/' if nested else '.'
+        common_kwargs = dict()
+        if 'FSStore' in str(fpath):
+            store = zarr.storage.FSStoreV3(
+                os.fspath(fpath), mode='r', dimension_separator=dimension_separator
+            )
+        else:
+            store = zarr.storage.DirectoryStoreV3(
+                os.fspath(fpath), dimension_separator=dimension_separator
+            )
+        return zarr.open(store, path=ds_name)[:]
     else:
         store = os.fspath(fpath)
     return zarr.open(store)[ds_name][:]

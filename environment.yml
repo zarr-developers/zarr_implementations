@@ -10,13 +10,15 @@ dependencies:
   - openimageio
   - nodejs
   - z5py >= 2.0.10
-  - python == 3.7.9
+  - python=3.7
   - scikit-image
   - pytest
-  - zarr >= 2.8.3
+  # temporarily need zarr from v3-spec-part6 development branch
+  # - zarr >= 2.8.3
   - pip
   - pandas
   - tabulate
   - pip:
       - pyn5
       - git+https://github.com/grlee77/zarrita.git@codec_update
+      - git+https://github.com/grlee77/zarr-python.git@v3-store-part6
