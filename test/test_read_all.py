@@ -73,8 +73,23 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
         "N5": [],
     },
+    "Rarr": {
+        "zarr": ["blosc"],
+        "zarr-v3": [],
+        "N5": [],
+    },
 }
 
+def read_with_Rarr(fpath, ds_name, nested=None):
+
+    cmd = (
+        f"implementations/jzarr/generate_data.sh "
+        f"-verify {str(fpath)} {ds_name}"
+    )
+
+    # will raise subprocess.CalledProcessError if return code is not 0
+    subprocess.check_output(cmd, shell=True)
+    return None
 
 def read_with_jzarr(fpath, ds_name, nested=None):
     if ds_name == "blosc":
