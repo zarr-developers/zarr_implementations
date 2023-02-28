@@ -1,2 +1,2 @@
 chooseCRANmirror(ind = 1)
-remotes::install_github("grimbough/Rarr")
+remotes::install_git("https://git.bioconductor.org/packages/Rarr")
