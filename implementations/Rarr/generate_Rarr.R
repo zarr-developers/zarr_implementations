@@ -7,9 +7,9 @@ chunk_dim <- c(100, 100, 1)
 
 for(codec in c("blosc", "zlib")) {
 
-  output_name <- file.path("../../data", sprintf("%s.zr", codec))
+  output_name <- file.path("../../data", "Rarr.zr", codec)
   
-  dir.create(output_name, recursive = TRUE)
+  dir.create(output_name, recursive = TRUE, showWarnings = FALSE)
   
   compressor <- switch (codec,
     "blosc" = Rarr:::use_blosc(),
