@@ -1,4 +1,2 @@
-required_pkgs <- c("remotes", "png")
-install.packages(required_pkgs)
-
+chooseCRANmirror(ind = 1)
 remotes::install_github("grimbough/Rarr")
