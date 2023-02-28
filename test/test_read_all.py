@@ -74,22 +74,11 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "N5": [],
     },
     "Rarr": {
-        "zarr": ["blosc"],
+        "zarr": ["blosc", "zlib"],
         "zarr-v3": [],
         "N5": [],
     },
 }
-
-def read_with_Rarr(fpath, ds_name, nested=None):
-
-    cmd = (
-        f"implementations/jzarr/generate_data.sh "
-        f"-verify {str(fpath)} {ds_name}"
-    )
-
-    # will raise subprocess.CalledProcessError if return code is not 0
-    subprocess.check_output(cmd, shell=True)
-    return None
 
 def read_with_jzarr(fpath, ds_name, nested=None):
     if ds_name == "blosc":
@@ -155,6 +144,13 @@ def read_with_xtensor_zarr(fpath, ds_name, nested):
     subprocess.check_call(["implementations/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
     return np.load(fname)["a"]
 
+def read_with_Rarr(fpath, ds_name, nested=None):
+
+    fname = "a.npz"
+    if os.path.exists(fname):
+        os.remove(fname)
+    subprocess.check_call(["Rscript", "implementations/Rarr/verify_data.R", fpath, ds_name])
+    return np.load(fname)["a"]
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
 HERE = Path(__file__).resolve().parent
@@ -252,6 +248,7 @@ def _get_read_fn(reading_library):
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
         "xtensor_zarr": read_with_xtensor_zarr,
+        "Rarr": read_with_Rarr,
     }[reading_library]
     return read_fn
 
