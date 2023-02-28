@@ -9,4 +9,4 @@ create_or_activate
 cd "${IMPL}"
 
 Rscript install_packages.R
-Rscript generate_data.R
+Rscript generate_Rarr.R
