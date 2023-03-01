@@ -14,4 +14,4 @@ zarr_array <- file.path(fpath, ds_name)
 x <- read_zarr_array(zarr_array_path = zarr_array)
 
 a <- np$array(x)
-np$savez("a.npz", a)
+np$save("a.npy", a)
