@@ -136,21 +136,19 @@ def read_with_zarrita(fpath, ds_name, nested):
     return h["/" + ds_name][:]
 
 def read_with_xtensor_zarr(fpath, ds_name, nested):
+def read_with_Rarr(fpath, ds_name, nested):
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    fname = "a.npz"
-    if os.path.exists(fname):
-        os.remove(fname)
-    subprocess.check_call(["implementations/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
-    return np.load(fname)["a"]
 
-def read_with_Rarr(fpath, ds_name, nested=None):
+    cmd = (
+        f"Rscript implementations/Rarr/verify_data_internal.R "
+        f"{str(fpath)} {ds_name}"
+    )
+ 
+    # will raise subprocess.CalledProcessError if return code is not 0
+    subprocess.check_output(cmd, shell=True)
+    return None
 
-    fname = "a.npz"
-    if os.path.exists(fname):
-        os.remove(fname)
-    subprocess.check_call(["Rscript", "implementations/Rarr/verify_data.R", fpath, ds_name])
-    return np.load(fname)["a"]
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
 HERE = Path(__file__).resolve().parent
