@@ -5,6 +5,8 @@ stopifnot(length(args) == 2)
 fpath <- args[1]
 ds_name <- args[2]
 
+source("implementations/Rarr/install_packages.R")
+
 library(loder)
 library(Rarr)
 
