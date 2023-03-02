@@ -20,3 +20,12 @@ dependencies:
   - pip:
       - pyn5
       - git+https://github.com/grlee77/zarrita.git@codec_update
+  - r-base
+  - r-loder
+  - r-remotes
+  - r-stringr
+  - r-httr
+  - r-jsonlite
+  - r-paws.storage
+  - r-r.utils
+  - r-curl

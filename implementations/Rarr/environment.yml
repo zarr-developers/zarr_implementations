@@ -4,7 +4,7 @@ channels:
 dependencies:
   ## required for generating data
   - r-base=4.2.2
-  - r-png
+  - r-loder
   ## require for checking data
   - r-reticulate
   ## R-pkgs needed for installing Rarr - will be simplified once in Bioc
