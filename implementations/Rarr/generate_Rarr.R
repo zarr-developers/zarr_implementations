@@ -6,7 +6,7 @@ img <- loder::readPng("../../data/reference_image.png")
 chunk_dim <- c(100, 100, 1)
 
 for (sep in c("_flat", "_nested")) {
-  for (codec in c("blosc/lz4", "zlib")) {
+  for (codec in c("blosc/lz4", "zlib", "raw")) {
       
     dir_name <- paste0("Rarr", sep, ".zr")
     output_name <- file.path("../../data", dir_name, codec)
@@ -17,7 +17,8 @@ for (sep in c("_flat", "_nested")) {
 
     compressor <- switch(codec,
       "blosc/lz4" = Rarr:::use_blosc(),
-      "zlib" = Rarr:::use_zlib()
+      "zlib" = Rarr:::use_zlib(),
+      "raw" = NULL
     )
 
     write_zarr_array(

@@ -137,7 +137,7 @@ def read_with_zarrita(fpath, ds_name, nested):
 
 def read_with_xtensor_zarr(fpath, ds_name, nested):
      if ds_name == "blosc":
-     ds_name = "blosc/lz4"
+        ds_name = "blosc/lz4"
      fname = "a.npz"
      if os.path.exists(fname):
          os.remove(fname)
