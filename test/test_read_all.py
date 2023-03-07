@@ -74,7 +74,7 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "N5": [],
     },
     "Rarr": {
-        "zarr": ["blosc", "raw", "zlib"],
+        "zarr": ["blosc", "gzip", "raw", "zlib"],
         "zarr-v3": [],
         "N5": [],
     },
