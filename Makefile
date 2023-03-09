@@ -31,13 +31,20 @@ define mk-impl-target
 # For each of the items in our "implementations" directory,
 # create a target which depends on the reference data and
 # calls the "driver.sh" script.
-.PHONY: $1
+#
+.PHONY: $1 $1-destroy
+
 $1: data/reference_image.png
-	bash $1/driver.sh
+	bash $1/driver.sh run
 
 # Alias in case the trailing slash is included
 .PHONE: $1/
 $1/: $1
+
+$1-destroy:
+	bash $1/driver.sh destroy
+
+clean: $1-destroy
 
 endef
 $(foreach impl,$(IMPLEMENTATIONS),$(eval $(call mk-impl-target,$(impl))))
