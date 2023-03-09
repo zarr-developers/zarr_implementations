@@ -46,6 +46,7 @@ jobs:
           environment-file: implementations/${{ inputs.implementation }}/environment.yml
           mamba-version: "*"
           python-version: ${{ inputs.python-version }}
+          activate-environment: ZI_${{ inputs.implementation }}
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
