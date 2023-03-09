@@ -2,7 +2,7 @@
 #
 #
 
-ENVNAME=ZI_zarr_python
+ENVNAME=ZI_zarr-python
 
 # Standard bootstrapping
 IMPL=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
