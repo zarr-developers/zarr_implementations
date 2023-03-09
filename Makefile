@@ -1,4 +1,5 @@
 IMPLEMENTATIONS=$(wildcard implementations/*)
+IMPLEMENTATIONS=$(filter-out implementations/xtensor_zarr, $(IMPEMENTATIONS))
 
 ifeq ($(TEST),) #################################################
 # If TEST is not set, by default build everything, generate
