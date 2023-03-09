@@ -6,4 +6,5 @@ dependencies:
   - make
   - cmake
   - gdal ==3.0.4
+  - tbb
   - xtensor-zarr >=0.0.8|=0.0.7=*_1
