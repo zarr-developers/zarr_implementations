@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains scripts to generate datasets in zarr-v2, zarr-v3 and
+This repository contains scripts to generate datasets in Zarr-v2, Zarr-v3 and
 N5 formats via a number of different implementations. Once generated, the test
 suite will attempt to have each library read all datasets with a supported
 format.

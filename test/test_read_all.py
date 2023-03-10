@@ -153,7 +153,7 @@ def read_with_Rarr(fpath, ds_name, nested):
         f"Rscript implementations/Rarr/verify_data_internal.R "
         f"{str(fpath)} {ds_name}"
     )
- 
+
     # will raise subprocess.CalledProcessError if return code is not 0
     subprocess.check_output(cmd, shell=True)
     return None
