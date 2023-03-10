@@ -1,0 +1,5 @@
+data/**/
+target*
+.netcdf-java
+.tensorstore
+.git

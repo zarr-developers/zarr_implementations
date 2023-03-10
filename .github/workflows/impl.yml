@@ -16,10 +16,13 @@ on:
       zarr-python:
         required: true
         type: string
+      action:
+        required: true
+        type: string
 
 jobs:
 
-  test_implementations:
+  impl:
     name: ${{ inputs.implementation }}-${{ inputs.platform }}-py${{ inputs.python-version }}-${{ inputs.zarr-python }}
     runs-on: ${{ inputs.platform }}
 
@@ -64,6 +67,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Run tests
+      #
+      # Choose read or write based on {{ action }}
+      #
+
+      - name: Download previous output for testing
+        uses: actions/download-artifact@v3
+        if: ${{ inputs.action == 'read' }}
+        with:
+          name: ${{ inputs.implementation }}-${{ inputs.zarr-python }}-data
+          path: data
+
+      - name: Run build
         shell: bash -l {0}
-        run: make implementations/${{ inputs.implementation }}
+        run: make implementations/${{ inputs.implementation }}-${{ inputs.action }}
+
+      - name: Save output for testing
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.action == 'write' }}
+        with:
+          name: ${{ inputs.implementation }}-${{ inputs.zarr-python }}-data
+          path: data

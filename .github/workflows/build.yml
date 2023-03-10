@@ -48,3 +48,11 @@ jobs:
       platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       zarr-python: ${{ matrix.zarr-python }}
+
+  read_released:
+    needs: [write_pre, write_released]
+    with:
+      implementation: ${{ matrix.implementation }}
+      platform: ${{ matrix.platform }}
+      python-version: ${{ matrix.python-version }}
+      zarr-python: ${{ matrix.zarr-python }}
