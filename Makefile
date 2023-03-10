@@ -28,15 +28,20 @@ endif ##########################################################
 data/reference_image.png:
 	python generate_reference_image.py
 
+.PHONY: write
+
 define mk-impl-target
 # For each of the items in our "implementations" directory,
 # create a target which depends on the reference data and
 # calls the "driver.sh" script.
 #
+
+write: $1
+
 .PHONY: $1 $1-destroy
 
 $1: data/reference_image.png
-	bash $1/driver.sh run
+	bash $1/driver.sh write
 
 # Alias in case the trailing slash is included
 .PHONE: $1/

@@ -4,7 +4,7 @@ ENVNAME=ZI_xtensor_zarr
 IMPL=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT=$( dirname $IMPL)
 
-run(){
+write(){
     create_or_activate
 
     cd "${IMPL}"

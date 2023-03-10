@@ -16,7 +16,7 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
 
-  test_implementations_released:
+  write_released:
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +33,7 @@ jobs:
       zarr-python: ${{ matrix.zarr-python }}
 
   # Re-run the same configurations but with a pre-release of Zarr
-  test_implementations_pre:
+  write_pre:
     strategy:
       fail-fast: false
       matrix:
@@ -41,7 +41,7 @@ jobs:
         platform: [ubuntu-latest]
         python-version: [3.8]
         zarr-python: [pre]
-    needs: [get_implementations, test_implementations_released]
+    needs: [get_implementations, write_released]
     uses: ./.github/workflows/impl.yml
     with:
       implementation: ${{ matrix.implementation }}

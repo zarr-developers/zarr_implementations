@@ -8,9 +8,9 @@ set -o pipefail
 
 argparse(){
     case "${1}" in
-        run)
-            echo "Running driver..."
-            run;;
+        write)
+            echo "Generating data..."
+            write;;
         destroy)
             echo "Tearing down..."
             destroy;;

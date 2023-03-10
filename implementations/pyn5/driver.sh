@@ -8,7 +8,7 @@ ENVNAME=ZI_pyn5
 IMPL=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 ROOT=$( dirname $IMPL)
 
-run(){
+write(){
     create_or_activate
     python $IMPL/generate_pyn5.py
 }
