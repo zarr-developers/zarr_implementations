@@ -13,7 +13,7 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 * https://github.com/gzuidhof/zarr.js
 * https://github.com/zarr-developers/zarr-python
 * https://github.com/constantinpape/z5
-
+* https://gihutb.com/grimbough/Rarr
 
 ## Other implementations
 

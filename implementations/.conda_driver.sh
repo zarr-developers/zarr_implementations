@@ -7,7 +7,7 @@
 set -e
 set -o pipefail
 
-create_or_activate(){ 
+create_or_activate(){
     if { conda env list | grep $ENVNAME; } >/dev/null 2>&1; then
         echo "Using $ENVNAME"
     else
@@ -17,4 +17,13 @@ create_or_activate(){
     eval "$(conda shell.bash hook)"
     echo "Activating $ENVNAME"
     conda activate $ENVNAME
+}
+
+destroy(){
+    if { conda env list | grep $ENVNAME; } >/dev/null 2>&1; then
+        echo "Destroying $ENVNAME"
+        conda env remove -y -n $ENVNAME
+    else
+        echo "No known env: $ENVNAME"
+    fi
 }
