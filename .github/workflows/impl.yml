@@ -52,7 +52,7 @@ jobs:
 
       - name: Install zarr dev (optional)
         shell: bash -l {0}
-        if: ${{ inputs.config.zarr-python == 'pre' }}
+        if: ${{ inputs.zarr-python == 'pre' }}
         run: |
           python -m pip install git+https://github.com/zarr-developers/zarr-python.git
 

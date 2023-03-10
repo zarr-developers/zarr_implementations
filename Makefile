@@ -44,7 +44,7 @@ $1: data/reference_image.png
 	bash $1/driver.sh write
 
 # Alias in case the trailing slash is included
-.PHONE: $1/
+.PHONY: $1/
 $1/: $1
 
 $1-destroy:
