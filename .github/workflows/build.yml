@@ -31,6 +31,7 @@ jobs:
       platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       zarr-python: ${{ matrix.zarr-python }}
+      action: write
 
   # Re-run the same configurations but with a pre-release of Zarr
   write_pre:
@@ -48,11 +49,21 @@ jobs:
       platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       zarr-python: ${{ matrix.zarr-python }}
+      action: write
 
   read_released:
+    strategy:
+      fail-fast: false
+      matrix:
+        implementation: ${{ fromJson(needs.get_implementations.outputs.matrix) }}
+        platform: [ubuntu-latest]
+        python-version: [3.8]
+        zarr-python: [pre]
     needs: [write_pre, write_released]
+    uses: ./.github/workflows/impl.yml
     with:
       implementation: ${{ matrix.implementation }}
       platform: ${{ matrix.platform }}
       python-version: ${{ matrix.python-version }}
       zarr-python: ${{ matrix.zarr-python }}
+      action: read

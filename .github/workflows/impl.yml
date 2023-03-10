@@ -23,7 +23,7 @@ on:
 jobs:
 
   impl:
-    name: ${{ inputs.implementation }}-${{ inputs.platform }}-py${{ inputs.python-version }}-${{ inputs.zarr-python }}
+    name: ${{ inputs.implementation }}-${{ inputs.action }}-${{ inputs.platform }}-py${{ inputs.python-version }}-${{ inputs.zarr-python }}
     runs-on: ${{ inputs.platform }}
 
     steps:
