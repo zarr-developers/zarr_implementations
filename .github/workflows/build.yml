@@ -59,7 +59,9 @@ jobs:
         platform: [ubuntu-latest]
         python-version: [3.8]
         zarr-python: [pre]
+    # Run the read job regardless once writing is complete
     needs: [write_pre, write_released]
+    if: ${{ always() }}
     uses: ./.github/workflows/impl.yml
     with:
       implementation: ${{ matrix.implementation }}
