@@ -7,4 +7,4 @@ dependencies:
   - numcodecs
   - pip
   - pip:
-      - git+https://github.com/grlee77/zarrita.git@codec_update
+      - git+https://github.com/scalableminds/zarrita.git@v3
