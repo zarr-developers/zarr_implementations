@@ -38,7 +38,10 @@ async function generateZarrFormat(codecIds = ["gzip", "blosc", "zlib", null]) {
   const path = p.join("..", "..", "data", "js.zr");
   const img = imread(p.join("..", "..", "data", "reference_image.png"));
 
-  fs.rmdirSync(path, { recursive: true, force: true });
+  if (fs.existsSync(path)) {
+    fs.rmdirSync(path, { recursive: true, force: true });
+  }
+
   const grp = await open(path);
   for (const id of codecIds) {
     const config = id ? STR_TO_COMPRESSOR[id] : null;

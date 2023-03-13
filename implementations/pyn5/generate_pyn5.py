@@ -9,7 +9,7 @@ CHUNKS = (100, 100, 1)
 
 def generate_n5_format(compressors=pyn5.CompressionType):
     here = Path(__file__).resolve().parent
-    data_dir = here.parent / "data"
+    data_dir = here.parent.parent / "data"
     path = data_dir / "pyn5.n5"
 
     im = imread(data_dir / "reference_image.png")

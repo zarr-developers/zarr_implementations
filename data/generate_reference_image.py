@@ -3,7 +3,7 @@ from skimage.io import imsave
 
 
 def write_reference_image():
-    path = '../data/reference_image.png'
+    path = 'reference_image.png'
     im = astronaut()
     imsave(path, im)
 

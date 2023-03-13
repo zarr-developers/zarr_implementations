@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  ## required for generating data
+  - r-base=4.2.2
+  - r-loder
+  ## R-pkgs needed for installing Rarr - will be simplified once in Bioc
+  - r-remotes
+  - r-stringr
+  - r-httr
+  - r-jsonlite
+  - r-paws.storage
+  - r-r.utils
+  - r-curl
+  ## compilers for Rarr codecs
+  - make
+  - gxx
+  - gcc
+variables:
+  LC_ALL: C.UTF-8

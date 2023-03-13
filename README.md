@@ -5,7 +5,6 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 
 ## Implementations currently tested
 
-
 * https://github.com/bcdev/jzarr
 * https://github.com/saalfeldlab/n5-zarr
 * https://github.com/aschampion/rust-n5
@@ -13,7 +12,7 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 * https://github.com/gzuidhof/zarr.js
 * https://github.com/zarr-developers/zarr-python
 * https://github.com/constantinpape/z5
-
+* https://gihutb.com/grimbough/Rarr
 
 ## Other implementations
 

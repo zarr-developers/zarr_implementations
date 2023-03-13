@@ -4,38 +4,70 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  test:
-    name: ${{ matrix.platform }} ${{ matrix.python-version }}
-    runs-on: ${{ matrix.platform }}
 
+  get_implementations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: List implementations
+        id: set-matrix
+        run: echo "matrix=$(cd implementations && ls -1 | jq -ncR '[inputs]')" >> $GITHUB_OUTPUT
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  write_released:
     strategy:
       fail-fast: false
       matrix:
+        implementation: ${{ fromJson(needs.get_implementations.outputs.matrix) }}
         platform: [ubuntu-latest]
-        python-version: [3.7]
+        python-version: [3.8]
+        zarr-python: [released]
+    needs: [get_implementations]
+    uses: ./.github/workflows/impl.yml
+    with:
+      implementation: ${{ matrix.implementation }}
+      platform: ${{ matrix.platform }}
+      python-version: ${{ matrix.python-version }}
+      zarr-python: ${{ matrix.zarr-python }}
+      action: write
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+# TMP: disabling to speed up testing
+# # Re-run the same configurations but with a pre-release of Zarr
+# write_pre:
+#   strategy:
+#     fail-fast: false
+#     matrix:
+#       implementation: ${{ fromJson(needs.get_implementations.outputs.matrix) }}
+#       platform: [ubuntu-latest]
+#       python-version: [3.8]
+#       zarr-python: [pre]
+#   needs: [get_implementations, write_released]
+#   uses: ./.github/workflows/impl.yml
+#   with:
+#     implementation: ${{ matrix.implementation }}
+#     platform: ${{ matrix.platform }}
+#     python-version: ${{ matrix.python-version }}
+#     zarr-python: ${{ matrix.zarr-python }}
+#     action: write
 
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v1
-        with:
-          auto-update-conda: true
-          channels: conda-forge,ome
-          environment-file: environment.yml
-          python-version: ${{ matrix.python-version }}
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
-      - name: Run tests
-        shell: bash -l {0}
-        run: make
+  read_released:
+    strategy:
+      fail-fast: false
+      matrix:
+        implementation: ${{ fromJson(needs.get_implementations.outputs.matrix) }}
+        platform: [ubuntu-latest]
+        python-version: [3.8]
+        zarr-python: [pre]
+    # Run the read job regardless once writing is complete
+    # TMP needs: [write_pre, write_released]
+    needs: [write_released]
+    if: ${{ always() }}
+    uses: ./.github/workflows/impl.yml
+    with:
+      implementation: ${{ matrix.implementation }}
+      platform: ${{ matrix.platform }}
+      python-version: ${{ matrix.python-version }}
+      zarr-python: ${{ matrix.zarr-python }}
+      action: read

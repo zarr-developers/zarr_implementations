@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(generate_data)
+    project(implementations)
 
     find_package(xtensor-zarr REQUIRED CONFIG)
     set(XTENSOR_ZARR_INCLUDE_DIR ${xtensor_zarr_INCLUDE_DIRS})

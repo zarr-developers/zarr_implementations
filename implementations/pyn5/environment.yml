@@ -1,0 +1,11 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - rust
+  - maturin
+  - python
+  - scikit-image
+  - pip
+  - pip:
+      - "git+https://github.com/pattonw/rust-pyn5@master#egg=pyn5"

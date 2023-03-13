@@ -1,0 +1,90 @@
+---
+name: Implementation tests
+
+on:
+  workflow_call:
+    inputs:
+      implementation:
+        required: true
+        type: string
+      platform:
+        required: true
+        type: string
+      python-version:
+        required: true
+        type: string
+      zarr-python:
+        required: true
+        type: string
+      action:
+        required: true
+        type: string
+
+jobs:
+
+  impl:
+    name: ${{ inputs.implementation }}-${{ inputs.action }}-${{ inputs.platform }}-py${{ inputs.python-version }}-${{ inputs.zarr-python }}
+    runs-on: ${{ inputs.platform }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v3
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{hashFiles( format('{0}/{1}/{2}', 'implementations/', inputs.implementation, '/environment.yml') ) }}
+
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          channels: conda-forge,defaults
+          channel-priority: true
+          environment-file: implementations/${{ inputs.implementation }}/environment.yml
+          mamba-version: "*"
+          python-version: ${{ inputs.python-version }}
+          activate-environment: ZI_${{ inputs.implementation }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - name: Install zarr dev (optional)
+        shell: bash -l {0}
+        if: ${{ inputs.zarr-python == 'pre' }}
+        run: |
+          python -m pip install git+https://github.com/zarr-developers/zarr-python.git
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      #
+      # Choose read or write based on {{ action }}
+      #
+
+      - name: Download previous output for testing
+        uses: actions/download-artifact@v3
+        if: ${{ inputs.action == 'read' }}
+        with:
+          name: ${{ inputs.implementation }}-${{ inputs.zarr-python }}-data
+          path: data
+
+      - name: Run build
+        shell: bash -l {0}
+        run: make implementations/${{ inputs.implementation }}-${{ inputs.action }}
+
+      - name: Save output for testing
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.action == 'write' }}
+        with:
+          name: ${{ inputs.implementation }}-${{ inputs.zarr-python }}-data
+          path: data
