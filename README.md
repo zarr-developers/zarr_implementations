@@ -5,7 +5,6 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 
 ## Implementations currently tested
 
-
 * https://github.com/bcdev/jzarr
 * https://github.com/saalfeldlab/n5-zarr
 * https://github.com/aschampion/rust-n5
@@ -13,7 +12,7 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 * https://github.com/gzuidhof/zarr.js
 * https://github.com/zarr-developers/zarr-python
 * https://github.com/constantinpape/z5
-
+* https://gihutb.com/grimbough/Rarr
 
 ## Other implementations
 
@@ -23,3 +22,13 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 * [Zarr.jl](https://github.com/meggart/Zarr.jl) #42
 * https://github.com/freeman-lab/zarr-js
 * [GDAL >= 3.4](https://gdal.org/drivers/raster/zarr.html)
+
+## Running locally
+
+* Create an environment: `conda env create -n ZI -f environment.yml`
+* Run `make`
+
+## Other features
+
+* `touch implementations/{impl}/.skip` to disable an implementation
+* Use `make NODEBUG=1 ...` to quiet output

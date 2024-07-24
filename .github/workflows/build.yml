@@ -4,38 +4,44 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  test:
-    name: ${{ matrix.platform }} ${{ matrix.python-version }}
-    runs-on: ${{ matrix.platform }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu-latest]
-        python-version: [3.7]
+  build:
 
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Cache conda
+        uses: actions/cache@v3
+        env:
+          # Increase this value to reset cache if etc/example-environment.yml has not changed
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
 
       - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v1
+        uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          channels: conda-forge,ome
+          activate-environment: ZI
+          channels: conda-forge,defaults
+          channel-priority: true
           environment-file: environment.yml
-          python-version: ${{ matrix.python-version }}
+          mamba-version: "*"
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: Cache local Maven repository
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Run tests
-        shell: bash -l {0}
-        run: make
+      - name: Run build
+        shell: bash -el {0}
+        run: |
+          make write;
+          pytest test/test_read_all.py

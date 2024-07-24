@@ -1,6 +1,6 @@
 target*
 __pycache__/
-generate_data/xtensor_zarr/build
+implmenetations/xtensor_zarr/build
 node_modules/
 report.*
 *.iml
@@ -8,3 +8,4 @@ report.*
 
 # ignore data subdirectories
 data/**/
+*iml

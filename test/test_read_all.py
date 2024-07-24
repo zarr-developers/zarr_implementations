@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Usage
 =====
@@ -33,6 +34,7 @@ nested or flat chunk storage scheme is used.
 
 """
 import os
+import sys
 import subprocess
 from typing import Dict, List
 from pathlib import Path
@@ -73,72 +75,71 @@ READABLE_CODECS: Dict[str, Dict[str, List[str]]] = {
         "zarr-v3": ["blosc", "gzip", "raw", "zlib"],
         "N5": [],
     },
+    "Rarr": {
+        "zarr": ["blosc", "gzip", "raw", "zlib"],
+        "zarr-v3": [],
+        "N5": [],
+    },
 }
 
+
+def make_read(name, fpath, ds_name, nested=None):
+    cmd = (
+        f"make implementations/{name}-read-fast "
+        f"NODEBUG=1 DIR={str(fpath)} DATASET={ds_name}"
+    )
+
+    # will raise subprocess.CalledProcessError if return code is not 0
+    result = subprocess.run(cmd, shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        raise Exception(
+            {
+                "command": cmd,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+            }
+        )
+    return result
 
 def read_with_jzarr(fpath, ds_name, nested=None):
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-
-    cmd = (
-        f"generate_data/jzarr/generate_data.sh "
-        f"-verify {str(fpath)} {ds_name}"
-    )
-
-    # will raise subprocess.CalledProcessError if return code is not 0
-    subprocess.check_output(cmd, shell=True)
-    return None
+    return make_read("jzarr", fpath, ds_name, nested)
 
 
 def read_with_zarr(fpath, ds_name, nested):
-    import zarr
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    if str(fpath).endswith('.zr'):
-        if nested:
-            if 'FSStore' in str(fpath):
-                store = zarr.storage.FSStore(
-                    os.fspath(fpath), dimension_separator='/', mode='r'
-                )
-            else:
-                store = zarr.storage.NestedDirectoryStore(os.fspath(fpath))
-        else:
-            if 'FSStore' in str(fpath):
-                store = zarr.storage.FSStore(os.fspath(fpath))
-            else:
-                store = zarr.storage.DirectoryStore(fpath)
-    else:
-        store = os.fspath(fpath)
-    return zarr.open(store)[ds_name][:]
+    return make_read("zarr-python", fpath, ds_name, nested)
 
 
 def read_with_pyn5(fpath, ds_name, nested):
-    import pyn5
-    return pyn5.File(fpath)[ds_name][:]
+    return make_read("pyn5", fpath, ds_name, nested)
 
 
 def read_with_z5py(fpath, ds_name, nested):
-    import z5py
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    return z5py.File(fpath)[ds_name][:]
+    return make_read("z5py", fpath, ds_name, nested)
 
 
 def read_with_zarrita(fpath, ds_name, nested):
-    import zarrita
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    h = zarrita.get_hierarchy(str(fpath.absolute()))
-    return h["/" + ds_name][:]
+    return make_read("zarrita", fpath, ds_name, nested)
 
 def read_with_xtensor_zarr(fpath, ds_name, nested):
+     if ds_name == "blosc":
+        ds_name = "blosc/lz4"
+     return make_read("xtensor_zarr", fpath, ds_name, nested)
+
+def read_with_Rarr(fpath, ds_name, nested):
+
     if ds_name == "blosc":
         ds_name = "blosc/lz4"
-    fname = "a.npz"
-    if os.path.exists(fname):
-        os.remove(fname)
-    subprocess.check_call(["generate_data/xtensor_zarr/build/run_xtensor_zarr", fpath, ds_name])
-    return np.load(fname)["a"]
+    return make_read("Rarr", fpath, ds_name, nested)
 
 
 EXTENSIONS = {"zarr": ".zr", "N5": ".n5", "zarr-v3": ".zr3"}
@@ -220,8 +221,8 @@ def create_params():
                     if write_attrs:
                         write_attrs = ' (' + write_attrs + ')'
                     ids.append(
-                        f"read {writing_library}{write_attrs} {fmt} using "
-                        f"{reading_library}, {codec}"
+                        f"W-{writing_library}{write_attrs} {fmt}_R-"
+                        f"{reading_library}_{codec}"
                     )
     return argnames, params, ids
 
@@ -237,6 +238,7 @@ def _get_read_fn(reading_library):
         "z5py": read_with_z5py,
         "zarrita": read_with_zarrita,
         "xtensor_zarr": read_with_xtensor_zarr,
+        "Rarr": read_with_Rarr,
     }[reading_library]
     return read_fn
 
@@ -254,11 +256,13 @@ def test_correct_read(fmt, writing_library, reading_library, codec, nested,
             f"file not found: {fpath}. Make sure you have generated the data "
             "using 'make data'"
         )
-    test = read_fn(fpath, codec, nested)
-    # Assume if None is returned, the read function has verified.
-    if test is not None:
-        assert test.shape == reference.shape
-        assert np.allclose(test, reference)
+    result = read_fn(fpath, codec, nested)
+
+    if b"Skipping" in result.stderr:
+        pytest.skip(result.stderr.decode())
+    else:
+        print(result.stdout)
+        print(result.stderr, file=sys.stderr)
 
 
 def tabulate_test_results(params, per_codec_tables=False):

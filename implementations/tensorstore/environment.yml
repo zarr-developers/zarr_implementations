@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+dependencies:
+  - tensorstore
+  # Test generation
+  - numcodecs
+  - python
+  - scikit-image
+  - zarr
+  - fsspec
