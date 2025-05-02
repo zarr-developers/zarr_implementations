@@ -23,3 +23,4 @@ Test for compatibility. See [doc/development_overview.md](doc/development_overvi
 * [Zarr.jl](https://github.com/meggart/Zarr.jl) #42
 * https://github.com/freeman-lab/zarr-js
 * [GDAL >= 3.4](https://gdal.org/drivers/raster/zarr.html)
+* [zarrita.js](https://github.com/manzt/zarrita.js)
